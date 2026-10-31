@@ -1,0 +1,19 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:10.9.11
+    container_name: jellyfin-triage-test
+    hostname: jellyfin-server
+    # user: "1000:1000"
+    ports:
+      - "8096:8096"
+    volumes:
+      # Jellyfin core config & cache
+      - ./test_env/config:/config
+      - ./test_env/cache:/cache
+      # Sample media folder (read-write so you can test file deletion / pruning)
+      - ./test_env/media:/media
+      # Mount compiled plugin directly into Jellyfin plugins directory
+      - ./dist/PlaylistTriage:/config/plugins/PlaylistTriage
+    restart: unless-stopped
+    environment:
+      - JELLYFIN_PublishedServerUrl=http://localhost:8096

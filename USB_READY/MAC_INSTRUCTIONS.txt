@@ -1,0 +1,60 @@
+================================================================================
+   JELLYFIN PLAYLIST TRIAGE & PRUNER - MAC INSTALLATION & 10.9+ CLIENT SETUP
+================================================================================
+
+Why is "Custom JavaScript code" missing in your Dashboard?
+Starting with Jellyfin 10.9, the core Jellyfin development team removed the
+unprotected "Custom JavaScript" input box from Dashboard -> General for
+security reasons (only Custom CSS remains in Dashboard -> Branding).
+
+To use custom UI extensions in Jellyfin 10.9+, you have 3 very easy options:
+
+--------------------------------------------------------------------------------
+OPTION 1: AUTOMATIC 1-CLICK INSTALLER (EASIEST)
+--------------------------------------------------------------------------------
+1. Plug your USB into the Mac and open the USB folder.
+2. Double-click "INSTALL_ON_MAC.command".
+3. The script will:
+   • Cleanly install the "PlaylistTriage" plugin into your Jellyfin plugins folder.
+   • Set full 755 read/write permissions so Jellyfin can manage and update it.
+   • Automatically detect your Mac's Jellyfin Web "index.html" and inject the
+     client script loader tag (<script src="/Plugins/PlaylistTriage/ClientScript"></script>)
+     right before </body>, creating a safety backup (index.html.bak).
+4. Restart your Jellyfin Server application on your Mac.
+5. Done! You will immediately see the triage icons in your player.
+
+--------------------------------------------------------------------------------
+OPTION 2: "JAVASCRIPT INJECTOR" PLUGIN (100% GUI VIA JELLYFIN DASHBOARD)
+--------------------------------------------------------------------------------
+If you prefer managing scripts through the Jellyfin UI without editing files:
+1. Double-click "INSTALL_ON_MAC.command" to install the server plugin.
+2. In Jellyfin Web, open Dashboard -> Plugins -> Repositories (gear icon at top).
+3. Click [+] to add a repository:
+   • Name: n00bcodr Plugins
+   • URL: https://raw.githubusercontent.com/n00bcodr/jellyfin-plugins/main/manifest.json
+4. Click Save, go to the "Catalog" tab, find "JavaScript Injector", click Install.
+5. Restart your Jellyfin server.
+6. Now in the sidebar, open "JavaScript Injector" (or Dashboard -> Plugins -> JavaScript Injector).
+7. Click "Add Script", paste the contents of "triageClient.js", toggle it Active, and click Save.
+
+--------------------------------------------------------------------------------
+OPTION 3: BROWSER USERSCRIPT (TAMPERMONKEY / VIOLENTMONKEY)
+--------------------------------------------------------------------------------
+If you watch Jellyfin in Safari, Chrome, Firefox, or Brave on your Mac:
+1. Install the free Tampermonkey or Violentmonkey extension in your browser.
+2. Click "Create a new script" and paste the contents of "triageClient.js".
+3. Set the match header to:
+   // @match        http://localhost:8096/*
+   // @match        http://*:8096/*
+   // @match        https://*:8096/*
+4. Save the script. The triage controls, hotkey, and icons will appear instantly!
+
+--------------------------------------------------------------------------------
+HOW TO CLEANLY UNINSTALL (OR FIX DASHBOARD UNINSTALL ERROR)
+--------------------------------------------------------------------------------
+If you ever click "Uninstall" in the Jellyfin Dashboard on Mac and it throws an
+error (caused by macOS file locks or root permissions on the plugins folder):
+1. Double-click "UNINSTALL_FROM_MAC.command" in this USB folder.
+2. Or run this single command in macOS Terminal:
+   rm -rf "$HOME/.local/share/jellyfin/plugins/PlaylistTriage" "$HOME/Library/Application Support/jellyfin/plugins/PlaylistTriage"
+3. Restart your Jellyfin Server.

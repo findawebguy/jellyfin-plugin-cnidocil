@@ -1,0 +1,72 @@
+========================================================================
+             JELLYFIN THEMES & VISUAL ENHANCEMENT GUIDE
+========================================================================
+
+Jellyfin Web has a rich community theme ecosystem. Because Jellyfin is 
+completely open-source and browser-based, you can transform the entire 
+interface from drab/default into a AAA-grade streaming service (like 
+Netflix, Apple TV, or modern dark glass) using one-line CSS imports!
+
+------------------------------------------------------------------------
+WHERE TO PASTE THESE THEMES IN JELLYFIN
+------------------------------------------------------------------------
+Option A: Just for Your User (Easiest)
+  1. Click your User Profile icon in the top right of Jellyfin.
+  2. Go to "Display".
+  3. Scroll down to "Custom CSS code".
+  4. Paste any theme URL block below and click Save!
+
+Option B: Global Server-Wide (For All Users)
+  1. Open Jellyfin Dashboard -> General (or Branding).
+  2. Paste the CSS block into the "Custom CSS code" box.
+  3. Click Save.
+
+------------------------------------------------------------------------
+TOP THEMES TO SPRUCE UP JELLYFIN
+------------------------------------------------------------------------
+
+1. ULTRACHROMIC (The #1 Rated Community Theme)
+   - Style: Dark glassmorphism, transparent blurred backdrops, and glowing neon controls.
+   - CSS to copy & paste:
+
+@import url("https://cdn.jsdelivr.net/gh/CTN-0414/ultrachromic@master/main.css");
+@import url("https://cdn.jsdelivr.net/gh/CTN-0414/ultrachromic@master/accent-type/glow.css");
+
+
+2. JELLYFLIX (Authentic 1:1 Netflix UI)
+   - Style: Netflix card scaling on hover, dark cinematic hero banners, and streamlined video player OSD.
+   - CSS to copy & paste:
+
+@import url("https://cdn.jsdelivr.net/gh/prayag17/JellyFlix@latest/theme.css");
+
+
+3. FlOw (Apple TV+ Inspired Frosted Glass)
+   - Style: Minimalist floating glass navigation, blur reflections, and rounded typography.
+   - CSS to copy & paste:
+
+@import url("https://cdn.jsdelivr.net/gh/BobHasNoSoul/FlOw@master/theme.css");
+
+
+4. NORD DARK (Theme Park)
+   - Style: Cool arctic-blue and deep slate palette tailored for low eye-strain.
+   - CSS to copy & paste:
+
+@import url("https://theme-park.dev/css/base/jellyfin/nord.css");
+
+
+5. DRACULA (Theme Park)
+   - Style: High-contrast purple and pink accents on deep obsidian.
+   - CSS to copy & paste:
+
+@import url("https://theme-park.dev/css/base/jellyfin/dracula.css");
+
+
+------------------------------------------------------------------------
+WANT A 1-CLICK THEME STORE INSIDE JELLYFIN?
+------------------------------------------------------------------------
+You can also install the community plugin "Jellyfin Skin Manager":
+  1. In Jellyfin Dashboard -> Plugins -> Repositories -> Add:
+     https://raw.githubusercontent.com/danieladov/jellyfin-plugin-skin-manager/master/manifest.json
+  2. In the Catalog, install "Skin Manager" and restart Jellyfin.
+  3. You will have a visual theme gallery with preview images directly in your dashboard!
+========================================================================

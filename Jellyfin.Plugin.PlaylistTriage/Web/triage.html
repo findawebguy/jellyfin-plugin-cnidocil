@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Cnidocil</title>
+</head>
+<body>
+    <div id="triageManagementPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-button,emby-select,emby-checkbox,emby-tabs">
+        <style>
+            #triageManagementPage {
+                font-family: inherit;
+            }
+            #triageManagementPage .content-primary {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 1.5em 1.5em 4em 1.5em;
+                box-sizing: border-box;
+            }
+
+            /* Flat Section Containers & Headers */
+            #triageManagementPage .verticalSection {
+                margin-bottom: 2.5em;
+            }
+            #triageManagementPage .sectionTitle {
+                font-size: 1.35rem;
+                font-weight: 400;
+                color: #ffffff;
+                margin: 0 0 0.75em 0;
+            }
+
+            /* Native Tabs Header */
+            #triageManagementPage .pt-localnav {
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                margin-bottom: 1.75em;
+                display: flex;
+                gap: 4px;
+            }
+            #triageManagementPage .pt-tab-button {
+                background: transparent;
+                border: none !important;
+                border-bottom: 3px solid transparent !important;
+                border-radius: 0 !important;
+                color: #a1a1aa;
+                padding: 0.8em 1.4em;
+                font-size: 0.95rem;
+                font-weight: 500;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                transition: color 0.16s ease, border-color 0.16s ease;
+                margin: 0;
+                outline: none !important;
+                box-shadow: none !important;
+            }
+            #triageManagementPage .pt-tab-button:hover {
+                color: #ffffff;
+            }
+            #triageManagementPage .pt-tab-button.active {
+                color: #00a4dc;
+                border-bottom-color: #00a4dc !important;
+                font-weight: 600;
+            }
+
+            /* Flat Status Summary Bar */
+            #triageManagementPage .pt-summary-bar {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 16px;
+                padding: 0.75em 0;
+                background: transparent !important;
+                border: none !important;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+                border-radius: 0 !important;
+                margin-bottom: 1.5em;
+                font-size: 0.88rem;
+            }
+            #triageManagementPage .pt-summary-item {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            #triageManagementPage .pt-summary-label {
+                color: #a1a1aa;
+                font-size: 0.8rem;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+            }
+            #triageManagementPage .pt-summary-val {
+                color: #ffffff;
+                font-weight: 600;
+            }
+            #triageManagementPage .pt-summary-val.highlight {
+                color: #00a4dc;
+            }
+            #triageManagementPage .pt-summary-val.danger {
+                color: #ef4444;
+            }
+            #triageManagementPage .pt-summary-divider {
+                width: 1px;
+                height: 18px;
+                background: rgba(255, 255, 255, 0.08);
+            }
+
+            /* Universal Dark Inputs & Dropdowns */
+            #triageManagementPage select,
+            #triageManagementPage select[is="emby-select"],
+            #triageManagementPage .emby-select {
+                background-color: #202020 !important;
+                color: #ffffff !important;
+                border: 1px solid rgba(255, 255, 255, 0.15) !important;
+                border-radius: 4px !important;
+                padding: 0.5em 2em 0.5em 0.75em !important;
+                font-family: inherit;
+                font-size: 0.95rem;
+                appearance: auto;
+                outline: none !important;
+                box-shadow: none !important;
+            }
+            #triageManagementPage select option,
+            #triageManagementPage select[is="emby-select"] option,
+            #triageManagementPage .emby-select option {
+                background-color: #202020 !important;
+                color: #ffffff !important;
+            }
+            #triageManagementPage input[type="text"],
+            #triageManagementPage .emby-input {
+                background-color: #202020 !important;
+                color: #ffffff !important;
+                border: 1px solid rgba(255, 255, 255, 0.15) !important;
+                border-radius: 4px !important;
+                padding: 0.5em 0.75em !important;
+                font-family: inherit;
+                font-size: 0.95rem;
+                outline: none !important;
+                box-shadow: none !important;
+            }
+
+            /* Strip Borders from Buttons / Material Design Classes */
+            #triageManagementPage button,
+            #triageManagementPage button[is="emby-button"],
+            #triageManagementPage .emby-button {
+                border: none !important;
+                outline: none !important;
+                box-shadow: none !important;
+                border-radius: 4px !important;
+                font-weight: 500;
+                padding: 0.6em 1.2em;
+                cursor: pointer;
+                transition: background-color 0.15s ease, opacity 0.15s ease;
+            }
+            #triageManagementPage .button-alt,
+            #triageManagementPage .btn-secondary {
+                background-color: #292929 !important;
+                color: #e0e0e0 !important;
+            }
+            #triageManagementPage .button-alt:hover,
+            #triageManagementPage .btn-secondary:hover {
+                background-color: #383838 !important;
+            }
+            #triageManagementPage .button-submit,
+            #triageManagementPage .btn-primary {
+                background-color: #00a4dc !important;
+                color: #ffffff !important;
+            }
+            #triageManagementPage .button-submit:hover,
+            #triageManagementPage .btn-primary:hover {
+                background-color: #0093c6 !important;
+            }
+            #triageManagementPage .button-delete,
+            #triageManagementPage .btn-danger,
+            #triageManagementPage .btn-purge,
+            #triageManagementPage .button-destructive {
+                background-color: #c62828 !important;
+                color: #ffffff !important;
+            }
+            #triageManagementPage .button-delete:hover,
+            #triageManagementPage .btn-danger:hover,
+            #triageManagementPage .btn-purge:hover,
+            #triageManagementPage .button-destructive:hover {
+                background-color: #b71c1c !important;
+            }
+
+            /* Icon-only Buttons */
+            #triageManagementPage button[is="paper-icon-button-light"],
+            #triageManagementPage .paper-icon-button-light {
+                background: transparent !important;
+                border: none !important;
+                outline: none !important;
+                box-shadow: none !important;
+                padding: 4px !important;
+                border-radius: 50% !important;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+            }
+            #triageManagementPage button[is="paper-icon-button-light"]:hover,
+            #triageManagementPage .paper-icon-button-light:hover {
+                background: rgba(255, 255, 255, 0.08) !important;
+            }
+
+            /* Toolbar Row */
+            #triageManagementPage .pt-toolbar-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 12px;
+                margin-bottom: 1.25em;
+            }
+            #triageManagementPage .pt-toolbar-group {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 10px;
+                flex: 1;
+            }
+
+            /* Data Table (matching official Jellyfin Reports plugin) */
+            #triageManagementPage .tableContainer {
+                width: 100%;
+                overflow-x: auto;
+                background: rgba(255, 255, 255, 0.015);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 4px;
+            }
+            #triageManagementPage table.tblLibraryReport {
+                width: 100% !important;
+                min-width: 960px;
+                border-collapse: collapse !important;
+                text-align: left;
+                font-size: 0.85rem;
+            }
+            #triageManagementPage table.tblLibraryReport th {
+                background: rgba(255, 255, 255, 0.035);
+                color: #a1a1aa;
+                font-weight: 600;
+                font-size: 0.72rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                padding: 0.85em 1em;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                white-space: nowrap;
+            }
+            #triageManagementPage table.tblLibraryReport td {
+                padding: 0.75em 1em;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+                vertical-align: middle;
+            }
+            #triageManagementPage table.tblLibraryReport tr:hover td {
+                background: rgba(255, 255, 255, 0.03);
+            }
+            #triageManagementPage table.tblLibraryReport tr.selected td {
+                background: rgba(0, 164, 220, 0.1);
+            }
+            #triageManagementPage .item-poster {
+                width: 40px;
+                height: 56px;
+                object-fit: cover;
+                border-radius: 4px;
+                background: rgba(255, 255, 255, 0.05);
+                display: block;
+            }
+            #triageManagementPage .badge {
+                display: inline-block;
+                padding: 0.15rem 0.5rem;
+                border-radius: 4px;
+                font-size: 0.72rem;
+                font-weight: 600;
+            }
+            #triageManagementPage .badge-res {
+                background: rgba(0, 164, 220, 0.16);
+                color: #00a4dc;
+                border: 1px solid rgba(0, 164, 220, 0.3);
+            }
+            #triageManagementPage .badge-res-4k {
+                background: rgba(168, 85, 247, 0.18);
+                color: #c084fc;
+                border: 1px solid rgba(168, 85, 247, 0.35);
+            }
+            #triageManagementPage .badge-codec {
+                background: rgba(255, 255, 255, 0.06);
+                color: #cbd5e0;
+                margin-left: 0.25rem;
+            }
+            #triageManagementPage .path-cell {
+                max-width: 260px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                font-family: monospace;
+                font-size: 0.78rem;
+                color: #94a3b8;
+                cursor: pointer;
+            }
+            #triageManagementPage .path-cell:hover {
+                color: #00a4dc;
+                text-decoration: underline;
+            }
+
+            /* PaperList Rows (Tab 2) */
+            #triageManagementPage .paperList {
+                background: rgba(255, 255, 255, 0.015);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 4px;
+                overflow: hidden;
+            }
+            #triageManagementPage .paperList .listItem {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.75em 1em;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                transition: background-color 0.15s ease;
+            }
+            #triageManagementPage .paperList .listItem:last-child {
+                border-bottom: none;
+            }
+            #triageManagementPage .paperList .listItem:hover {
+                background-color: rgba(255, 255, 255, 0.03);
+            }
+
+            /* Purge Safety Confirmation Modal */
+            #triageManagementPage .triage-modal-backdrop {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0, 0, 0, 0.75);
+                z-index: 2000;
+                justify-content: center;
+                align-items: center;
+            }
+            #triageManagementPage .triage-modal {
+                background: #181818;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                width: 92%;
+                max-width: 560px;
+                padding: 1.5em;
+                box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+            }
+            #triageManagementPage .empty-state {
+                text-align: center;
+                padding: 3em 1em;
+                color: #a1a1aa;
+            }
+            #triageManagementPage .empty-state h3 {
+                color: #ffffff;
+                margin: 0 0 0.5em 0;
+                font-size: 1.1rem;
+            }
+        </style>
+
+        <div class="content-primary">
+            <!-- Native Header Title (Clean text, no colorful icon) -->
+            <div class="verticalSection" style="margin-bottom: 1em;">
+                <h2 class="sectionTitle">Cnidocil</h2>
+            </div>
+
+            <!-- Native Two-Tab Navigation Bar -->
+            <div class="pt-localnav">
+                <button type="button" class="pt-tab-button active" id="tabBtnTriage" data-tab="tabTriage">
+                    <span class="material-icons" style="font-size:18px;">playlist_play</span>
+                    <span>Triage &amp; Prune</span>
+                </button>
+                <button type="button" class="pt-tab-button" id="tabBtnConfig" data-tab="tabConfig">
+                    <span class="material-icons" style="font-size:18px;">tune</span>
+                    <span>Configuration &amp; OSD Setup</span>
+                </button>
+            </div>
+
+            <!-- TAB 1: TRIAGE & PRUNE (DEFAULT VIEW) -->
+            <div id="tabTriage" class="pt-tab-content">
+                <!-- Flat Status Summary Bar -->
+                <div class="pt-summary-bar">
+                    <div class="pt-summary-item">
+                        <span class="pt-summary-label">Active Playlist:</span>
+                        <span id="statPlaylistName" class="pt-summary-val highlight">Loading...</span>
+                    </div>
+                    <div class="pt-summary-divider"></div>
+                    <div class="pt-summary-item">
+                        <span class="pt-summary-label">Items:</span>
+                        <span id="statItemCount" class="pt-summary-val">0</span>
+                    </div>
+                    <div class="pt-summary-divider"></div>
+                    <div class="pt-summary-item">
+                        <span class="pt-summary-label">Reclaimable Space:</span>
+                        <span id="statTotalSize" class="pt-summary-val danger">0 B</span>
+                    </div>
+                    <div class="pt-summary-divider"></div>
+                    <div class="pt-summary-item">
+                        <span class="pt-summary-label">Privileges:</span>
+                        <span id="statPermissions" class="pt-summary-val">Checking...</span>
+                    </div>
+                    <div style="margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button is="emby-button" type="button" id="btnRefreshList" class="button-alt" style="padding:0.4em 0.8em;font-size:0.82rem;">
+                            <span class="material-icons" style="font-size:16px;margin-right:4px;">refresh</span>
+                            <span>Refresh</span>
+                        </button>
+                        <button is="emby-button" type="button" id="btnPurgeEntireQueueHeader" class="button-delete" style="padding:0.4em 0.8em;font-size:0.82rem;">
+                            <span class="material-icons" style="font-size:16px;margin-right:4px;">delete_forever</span>
+                            <span>Purge Active Queue</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Single Clean Horizontal Toolbar Row -->
+                <div class="pt-toolbar-row">
+                    <div class="pt-toolbar-group">
+                        <div class="selectContainer" style="margin:0;min-width:200px;">
+                            <label class="selectLabel" for="selectPlaylist" style="display:none;">Viewing Playlist</label>
+                            <select is="emby-select" id="selectPlaylist" class="emby-select"></select>
+                        </div>
+                        <div class="inputContainer" style="margin:0;flex:1;min-width:240px;">
+                            <label class="inputLabel" for="inputFilterTable" style="display:none;">Search</label>
+                            <input type="text" id="inputFilterTable" class="emby-input" placeholder="Search title, codec, resolution, path..." />
+                        </div>
+                        <div class="selectContainer" style="margin:0;min-width:170px;">
+                            <label class="selectLabel" for="selectSortTable" style="display:none;">Sort</label>
+                            <select is="emby-select" id="selectSortTable" class="emby-select">
+                                <option value="default">Playlist Order</option>
+                                <option value="size_desc">Size (Largest First)</option>
+                                <option value="size_asc">Size (Smallest First)</option>
+                                <option value="title_asc">Title (A - Z)</option>
+                                <option value="bitrate_desc">Bitrate (Highest First)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                        <button is="emby-button" type="button" id="btnBulkRemovePlaylist" class="button-alt" style="padding:0.5em 0.9em;font-size:0.82rem;">
+                            <span class="material-icons" style="font-size:16px;margin-right:4px;">playlist_remove</span>
+                            <span>Remove Selected</span>
+                        </button>
+                        <button is="emby-button" type="button" id="btnBulkPurgeDisk" class="button-delete" style="padding:0.5em 0.9em;font-size:0.82rem;">
+                            <span class="material-icons" style="font-size:16px;margin-right:4px;">delete</span>
+                            <span>Delete from Disk</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Media Table (Maximized vertical space matching Reports plugin) -->
+                <div class="tableContainer">
+                    <table class="tblLibraryReport stripedTable ui-responsive table-stroke" id="tblTriageItems">
+                        <thead>
+                            <tr>
+                                <th style="width:36px;text-align:center;">
+                                    <label class="emby-checkbox-label" style="display:inline-flex;height:1.8em;padding-left:1.8em;margin:0;width:auto;">
+                                        <input type="checkbox" is="emby-checkbox" class="emby-checkbox" id="selectAllCheckbox" />
+                                        <span class="checkboxOutline">
+                                            <span class="material-icons checkboxIcon checkboxIcon-checked" aria-hidden="true">check</span>
+                                            <span class="material-icons checkboxIcon checkboxIcon-unchecked" aria-hidden="true"></span>
+                                        </span>
+                                    </label>
+                                </th>
+                                <th style="width:48px;">Media</th>
+                                <th>Title</th>
+                                <th>Quality</th>
+                                <th>Codec</th>
+                                <th>Bitrate</th>
+                                <th>Size</th>
+                                <th>Duration</th>
+                                <th>Storage Path</th>
+                                <th style="width:140px;text-align:right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="triageTableBody">
+                            <tr>
+                                <td colspan="10" class="empty-state">
+                                    <h3>Loading triage items...</h3>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 2: CONFIGURATION & OSD SETUP -->
+            <div id="tabConfig" class="pt-tab-content" style="display:none;">
+                <!-- Section 1: Your Triage Playlists (Flattened, no dark card box, clean text header) -->
+                <div class="verticalSection">
+                    <h2 class="sectionTitle">Your Triage Playlists</h2>
+                    <div style="font-size:0.85rem;color:#a1a1aa;margin-bottom:0.75em;">
+                        Manage custom triage playlists, default targets, and player OSD pins.
+                    </div>
+
+                    <!-- Native .paperList Rows Container -->
+                    <div id="playlistListContainer" class="paperList" style="margin-bottom:1.5em;">
+                        <div style="padding:1.2em;color:#a1a1aa;text-align:center;">Loading playlists...</div>
+                    </div>
+
+                    <!-- Add Playlist Sub-form (Directly on page background) -->
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <div class="inputContainer" style="margin:0;flex:1;min-width:220px;">
+                            <label class="inputLabel" for="inputNewPlaylistName" style="display:none;">Playlist Name</label>
+                            <input type="text" id="inputNewPlaylistName" class="emby-input" placeholder="New playlist name (e.g. Keepers, Re-encode)..." />
+                        </div>
+                        <div class="selectContainer" style="margin:0;min-width:140px;">
+                            <label class="selectLabel" for="selectNewPlaylistIcon" style="display:none;">Icon</label>
+                            <select is="emby-select" id="selectNewPlaylistIcon" class="emby-select">
+                                <option value="bookmark">Bookmark</option>
+                                <option value="film">Film / Video</option>
+                                <option value="trash">Trash / Delete</option>
+                                <option value="star">Star / Favorite</option>
+                                <option value="scissors">Scissors / Prune</option>
+                                <option value="fire">Fire / Hot</option>
+                                <option value="heart">Heart / Loved</option>
+                                <option value="archive">Archive</option>
+                                <option value="clock">Clock / Watch Later</option>
+                                <option value="folder">Folder</option>
+                            </select>
+                        </div>
+                        <div class="checkboxContainer" style="margin:0;">
+                            <label class="emby-checkbox-label" style="display:inline-flex;align-items:center;height:2em;padding-left:2.4em;margin:0;">
+                                <input type="checkbox" is="emby-checkbox" class="emby-checkbox" id="cbNewPlaylistPinOsd" checked />
+                                <span class="checkboxLabel" style="font-size:0.85rem;">Pin to OSD</span>
+                                <span class="checkboxOutline">
+                                    <span class="material-icons checkboxIcon checkboxIcon-checked" aria-hidden="true">check</span>
+                                    <span class="material-icons checkboxIcon checkboxIcon-unchecked" aria-hidden="true"></span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="checkboxContainer" style="margin:0;">
+                            <label class="emby-checkbox-label" style="display:inline-flex;align-items:center;height:2em;padding-left:2.4em;margin:0;">
+                                <input type="checkbox" is="emby-checkbox" class="emby-checkbox" id="cbNewPlaylistDefault" />
+                                <span class="checkboxLabel" style="font-size:0.85rem;">Default</span>
+                                <span class="checkboxOutline">
+                                    <span class="material-icons checkboxIcon checkboxIcon-checked" aria-hidden="true">check</span>
+                                    <span class="material-icons checkboxIcon checkboxIcon-unchecked" aria-hidden="true"></span>
+                                </span>
+                            </label>
+                        </div>
+                        <button is="emby-button" type="button" id="btnCreatePlaylist" class="button-submit">
+                            <span class="material-icons" style="font-size:16px;margin-right:4px;">add</span>
+                            <span>Create Playlist</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Section 2: Keyboard Shortcut (Flattened, clean text header) -->
+                <div class="verticalSection">
+                    <h2 class="sectionTitle">Playback Keyboard Shortcut</h2>
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <div class="inputContainer" style="margin:0;flex:1;max-width:320px;">
+                            <label class="inputLabel" for="inputDashHotkey" style="display:none;">Trigger Hotkey</label>
+                            <input type="text" id="inputDashHotkey" class="emby-input" style="font-family:monospace;" />
+                            <div class="fieldDescription" style="color:#a1a1aa;font-size:0.8rem;margin-top:0.4em;">
+                                Press desired key combination while focused in input (e.g. Ctrl+Shift+B)
+                            </div>
+                        </div>
+                        <button is="emby-button" type="button" id="btnSaveDashHotkey" class="button-submit">
+                            <span>Save Hotkey</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Section 3: In-Player OSD Playbar Preferences (Flattened, clean text header) -->
+                <div class="verticalSection">
+                    <h2 class="sectionTitle">In-Player OSD Playbar Preferences</h2>
+                    <div style="display:flex;flex-direction:column;gap:14px;">
+                        <div class="checkboxContainer" style="margin:0;">
+                            <label class="emby-checkbox-label" style="display:inline-flex;align-items:center;height:2em;padding-left:2.4em;margin:0;">
+                                <input type="checkbox" is="emby-checkbox" class="emby-checkbox" id="cbStudioSwapOsd" />
+                                <span class="checkboxLabel">Swap Player Controls (Volume Slider Left ↔ Transport Controls Right)</span>
+                                <span class="checkboxOutline">
+                                    <span class="material-icons checkboxIcon checkboxIcon-checked" aria-hidden="true">check</span>
+                                    <span class="material-icons checkboxIcon checkboxIcon-unchecked" aria-hidden="true"></span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="checkboxContainer" style="margin:0;">
+                            <label class="emby-checkbox-label" style="display:inline-flex;align-items:center;height:2em;padding-left:2.4em;margin:0;">
+                                <input type="checkbox" is="emby-checkbox" class="emby-checkbox" id="cbStudioHideStop" />
+                                <span class="checkboxLabel">Hide Stop Button on Playbar</span>
+                                <span class="checkboxOutline">
+                                    <span class="material-icons checkboxIcon checkboxIcon-checked" aria-hidden="true">check</span>
+                                    <span class="material-icons checkboxIcon checkboxIcon-unchecked" aria-hidden="true"></span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="checkboxContainer" style="margin:0;">
+                            <label class="emby-checkbox-label" style="display:inline-flex;align-items:center;height:2em;padding-left:2.4em;margin:0;">
+                                <input type="checkbox" is="emby-checkbox" class="emby-checkbox" id="cbStudioHidePrevNext" />
+                                <span class="checkboxLabel">Hide Previous / Next Track Buttons on Playbar</span>
+                                <span class="checkboxOutline">
+                                    <span class="material-icons checkboxIcon checkboxIcon-checked" aria-hidden="true">check</span>
+                                    <span class="material-icons checkboxIcon checkboxIcon-unchecked" aria-hidden="true"></span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Purge Safety Confirmation Modal -->
+        <div id="purgeModalBackdrop" class="triage-modal-backdrop">
+            <div class="triage-modal">
+                <h3 style="margin:0 0 1em 0;font-size:1.2rem;color:#ef4444;display:flex;align-items:center;gap:8px;">
+                    <span class="material-icons">warning</span>
+                    <span>Confirm Permanent Disk Purge (<span id="modalPurgeQueueTitle" style="color:#fff;"></span>)</span>
+                </h3>
+                <div style="margin-bottom:1.5em;font-size:0.9rem;line-height:1.5;color:#d4d4d8;">
+                    <p style="margin-top:0;">You are about to permanently delete <strong id="modalPurgeCount" style="color:#fff;">0</strong> media files in queue <strong id="modalPurgeQueueName" style="color:#fff;background:rgba(239,68,68,0.25);padding:2px 7px;border-radius:4px;border:1px solid rgba(239,68,68,0.35);"></strong> from your storage drives. This action <strong style="color:#ef4444;">cannot be undone</strong>.</p>
+                    <p>Total disk space to reclaim: <strong id="modalPurgeSize" style="color:#00a4dc;">0 B</strong></p>
+                    <div id="modalPurgeFilesList" style="max-height:160px;overflow-y:auto;background:#101010;padding:0.75em;border-radius:4px;margin:1em 0;font-family:monospace;font-size:0.78rem;border:1px solid rgba(255,255,255,0.08);"></div>
+                    <div class="checkboxContainer" style="margin:0.5em 0 0 0;">
+                        <label class="emby-checkbox-label" style="display:inline-flex;align-items:center;height:2em;padding-left:2.4em;margin:0;">
+                            <input type="checkbox" is="emby-checkbox" class="emby-checkbox" id="modalConfirmCheckbox" />
+                            <span class="checkboxLabel" style="font-size:0.85rem;">I understand these files will be permanently erased from disk.</span>
+                            <span class="checkboxOutline">
+                                <span class="material-icons checkboxIcon checkboxIcon-checked" aria-hidden="true">check</span>
+                                <span class="material-icons checkboxIcon checkboxIcon-unchecked" aria-hidden="true"></span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                <div style="display:flex;justify-content:flex-end;gap:10px;">
+                    <button is="emby-button" type="button" id="btnCancelPurge" class="button-alt">Cancel</button>
+                    <button is="emby-button" type="button" id="btnConfirmPurge" class="button-delete" disabled style="opacity:0.5;cursor:not-allowed;">Permanently Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Embedded Dashboard Controller Script -->
+        <script type="text/javascript">
+            (function () {
+                'use strict';
+
+                var MATERIAL_ICONS = {
+                    bookmark: 'bookmark',
+                    film: 'movie',
+                    trash: 'delete',
+                    star: 'star',
+                    scissors: 'content_cut',
+                    fire: 'local_fire_department',
+                    heart: 'favorite',
+                    archive: 'archive',
+                    clock: 'schedule',
+                    folder: 'folder'
+                };
+
+                var currentPlaylist = '';
+                var playlistsCache = [];
+                var configCache = {
+                    defaultPlaylistName: 'Triage Queue',
+                    configuredHotkey: 'Ctrl+Shift+B',
+                    swapOsdControls: false,
+                    hideStopButton: false,
+                    hidePrevNextButtons: false
+                };
+                var triageData = { items: [], userCanDeleteFiles: false, totalItems: 0, formattedTotalSize: '0 B', playlistId: null };
+                var selectedItemIds = new Set();
+
+                function prop(obj, key) {
+                    if (!obj) return undefined;
+                    if (obj[key] !== undefined) return obj[key];
+                    var pascal = key.charAt(0).toUpperCase() + key.slice(1);
+                    return obj[pascal];
+                }
+
+                function getApiUrl(path) {
+                    if (typeof ApiClient !== 'undefined' && ApiClient.getUrl) {
+                        return ApiClient.getUrl('Plugins/PlaylistTriage/' + path);
+                    }
+                    return '/Plugins/PlaylistTriage/' + path;
+                }
+
+                function getCurrentUserIdSafe() {
+                    if (typeof ApiClient !== 'undefined' && ApiClient.getCurrentUserId) {
+                        return ApiClient.getCurrentUserId() || '';
+                    }
+                    return '';
+                }
+
+                function ensureClientExtensionLoaded() {
+                    if (!window.PlaylistTriageInitialized && !document.getElementById('pt-client-ext-script')) {
+                        var s = document.createElement('script');
+                        s.id = 'pt-client-ext-script';
+                        s.src = getApiUrl('ClientScript');
+                        s.defer = true;
+                        document.head.appendChild(s);
+                    }
+                }
+
+                function showDashNotice(msg) {
+                    if (window.Dashboard && Dashboard.alert) {
+                        Dashboard.alert({ message: msg });
+                    } else {
+                        alert(msg);
+                    }
+                }
+
+                function switchTab(tabId) {
+                    document.querySelectorAll('#triageManagementPage .pt-tab-button').forEach(function (btn) {
+                        btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
+                    });
+                    var tabTriage = document.getElementById('tabTriage');
+                    var tabConfig = document.getElementById('tabConfig');
+                    if (tabTriage) tabTriage.style.display = tabId === 'tabTriage' ? 'block' : 'none';
+                    if (tabConfig) tabConfig.style.display = tabId === 'tabConfig' ? 'block' : 'none';
+                }
+
+                function loadConfigAndPlaylists(callback) {
+                    if (typeof ApiClient === 'undefined' || !ApiClient.ajax) {
+                        setTimeout(function () { loadConfigAndPlaylists(callback); }, 150);
+                        return;
+                    }
+
+                    ApiClient.ajax({
+                        type: 'GET',
+                        url: getApiUrl('Configuration?_t=' + Date.now()),
+                        dataType: 'json'
+                    }).then(function (cfg) {
+                        if (cfg) {
+                            var defName = prop(cfg, 'defaultPlaylistName') || 'Triage Queue';
+                            if (defName.toLowerCase() === 'vidz') defName = 'Triage Queue';
+                            configCache.defaultPlaylistName = defName;
+                            configCache.configuredHotkey = prop(cfg, 'configuredHotkey') || 'Ctrl+Shift+B';
+                            configCache.swapOsdControls = !!prop(cfg, 'swapOsdControls');
+                            configCache.hideStopButton = !!prop(cfg, 'hideStopButton');
+                            configCache.hidePrevNextButtons = !!prop(cfg, 'hidePrevNextButtons');
+                        }
+
+                        var hkInput = document.getElementById('inputDashHotkey');
+                        if (hkInput) hkInput.value = configCache.configuredHotkey;
+
+                        var cbSwap = document.getElementById('cbStudioSwapOsd');
+                        if (cbSwap) cbSwap.checked = configCache.swapOsdControls;
+                        var cbStop = document.getElementById('cbStudioHideStop');
+                        if (cbStop) cbStop.checked = configCache.hideStopButton;
+                        var cbPrev = document.getElementById('cbStudioHidePrevNext');
+                        if (cbPrev) cbPrev.checked = configCache.hidePrevNextButtons;
+
+                        if (!currentPlaylist) {
+                            currentPlaylist = configCache.defaultPlaylistName;
+                        }
+
+                        return ApiClient.ajax({
+                            type: 'GET',
+                            url: getApiUrl('Playlists?userId=' + getCurrentUserIdSafe() + '&_t=' + Date.now()),
+                            dataType: 'json'
+                        });
+                    }).then(function (rawList) {
+                        playlistsCache = (rawList || []).map(function (p) {
+                            return {
+                                id: prop(p, 'id'),
+                                name: prop(p, 'name') || 'Playlist',
+                                itemCount: prop(p, 'itemCount') || 0,
+                                iconKey: prop(p, 'iconKey') || 'bookmark',
+                                isDefault: !!prop(p, 'isDefault'),
+                                isPinned: !!prop(p, 'isPinned')
+                            };
+                        }).filter(function (p) {
+                            return (p.name || '').toLowerCase() !== 'vidz';
+                        });
+
+                        if ((currentPlaylist || '').toLowerCase() === 'vidz') {
+                            currentPlaylist = '';
+                        }
+
+                        var exists = playlistsCache.some(function (p) {
+                            return p.name.toLowerCase() === (currentPlaylist || '').toLowerCase();
+                        });
+                        if (!exists && playlistsCache.length > 0) {
+                            var def = playlistsCache.find(function (p) { return p.isDefault; }) || playlistsCache[0];
+                            currentPlaylist = def.name;
+                        }
+
+                        renderPlaylistRowsAndSelect();
+                        if (callback) callback();
+                    }).catch(function (err) {
+                        console.error('[PlaylistTriage] Failed loading config/playlists:', err);
+                        if (callback) callback();
+                    });
+                }
+
+                function renderPlaylistRowsAndSelect() {
+                    var listContainer = document.getElementById('playlistListContainer');
+                    var select = document.getElementById('selectPlaylist');
+                    if (!listContainer || !select) return;
+
+                    listContainer.innerHTML = '';
+                    select.innerHTML = '';
+
+                    if (playlistsCache.length === 0) {
+                        listContainer.innerHTML = '<div style="padding:1.2em;color:#a1a1aa;text-align:center;">No triage playlists configured.</div>';
+                        return;
+                    }
+
+                    playlistsCache.forEach(function (p) {
+                        var isSelected = p.name.toLowerCase() === (currentPlaylist || '').toLowerCase();
+                        var iconName = MATERIAL_ICONS[p.iconKey] || 'bookmark';
+
+                        var row = document.createElement('div');
+                        row.className = 'listItem';
+                        row.style.background = isSelected ? 'rgba(0,164,220,0.06)' : '';
+
+                        // Left side: Icon + Name + Count
+                        var left = document.createElement('div');
+                        left.style.cssText = 'display:flex;align-items:center;gap:12px;cursor:pointer;flex:1;';
+                        left.onclick = function () {
+                            currentPlaylist = p.name;
+                            renderPlaylistRowsAndSelect();
+                            loadTriageItems();
+                        };
+
+                        var iconEl = document.createElement('span');
+                        iconEl.className = 'material-icons';
+                        iconEl.style.cssText = 'font-size:20px;color:' + (p.isDefault ? '#00a4dc' : '#a1a1aa') + ';';
+                        iconEl.textContent = iconName;
+                        left.appendChild(iconEl);
+
+                        var nameSpan = document.createElement('span');
+                        nameSpan.style.cssText = 'font-weight:500;font-size:0.95rem;color:#ffffff;';
+                        nameSpan.textContent = p.name;
+                        left.appendChild(nameSpan);
+
+                        var countSpan = document.createElement('span');
+                        countSpan.style.cssText = 'color:rgba(255,255,255,0.6);font-size:0.85rem;';
+                        countSpan.textContent = '(' + p.itemCount + (p.itemCount === 1 ? ' item' : ' items') + ')';
+                        left.appendChild(countSpan);
+
+                        row.appendChild(left);
+
+                        // Right side: Direct inline action toggles
+                        var right = document.createElement('div');
+                        right.style.cssText = 'display:flex;align-items:center;gap:10px;';
+
+                        // Default indicator or button
+                        if (p.isDefault) {
+                            var defBadge = document.createElement('span');
+                            defBadge.style.cssText = 'background:rgba(0,164,220,0.18);color:#00a4dc;border:1px solid rgba(0,164,220,0.3);font-size:0.75rem;padding:0.25em 0.65em;border-radius:4px;display:inline-flex;align-items:center;gap:4px;font-weight:600;';
+                            defBadge.innerHTML = '<span class="material-icons" style="font-size:14px;">check_circle</span>Default';
+                            right.appendChild(defBadge);
+                        } else {
+                            var btnSetDef = document.createElement('button');
+                            btnSetDef.type = 'button';
+                            btnSetDef.className = 'emby-button button-alt';
+                            btnSetDef.style.cssText = 'font-size:0.75rem;padding:0.35em 0.75em;margin:0;cursor:pointer;';
+                            btnSetDef.textContent = 'Set as Default';
+                            btnSetDef.addEventListener('click', function (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setDefaultPlaylist(p.name);
+                            });
+                            right.appendChild(btnSetDef);
+                        }
+
+                        // Pin to OSD toggle icon button
+                        var btnPin = document.createElement('button');
+                        btnPin.type = 'button';
+                        btnPin.className = 'paper-icon-button-light';
+                        btnPin.style.cssText = 'color:' + (p.isPinned ? '#00a4dc' : 'rgba(255,255,255,0.3)') + ';margin:0;padding:4px;cursor:pointer;';
+                        btnPin.title = p.isPinned ? 'Pinned to Player OSD (Click to unpin)' : 'Pin to Player OSD';
+                        btnPin.innerHTML = '<span class="material-icons" style="font-size:20px;">push_pin</span>';
+                        btnPin.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            togglePinPlaylist(p.name, !p.isPinned);
+                        });
+                        right.appendChild(btnPin);
+
+                        // Delete playlist icon button
+                        var btnDel = document.createElement('button');
+                        btnDel.type = 'button';
+                        btnDel.className = 'paper-icon-button-light';
+                        btnDel.style.cssText = 'color:#ef4444;margin:0;padding:4px;';
+                        btnDel.title = 'Remove playlist';
+                        btnDel.innerHTML = '<span class="material-icons" style="font-size:20px;">delete_outline</span>';
+                        btnDel.onclick = function (e) {
+                            e.stopPropagation();
+                            deletePlaylist(p.name);
+                        };
+                        right.appendChild(btnDel);
+
+                        row.appendChild(right);
+                        listContainer.appendChild(row);
+
+                        // Select dropdown option in Tab 1 toolbar
+                        var opt = document.createElement('option');
+                        opt.value = p.name;
+                        opt.textContent = p.name + ' (' + p.itemCount + ' items)' + (p.isDefault ? ' [Default]' : '');
+                        if (isSelected) opt.selected = true;
+                        select.appendChild(opt);
+                    });
+                }
+
+                function setDefaultPlaylist(name) {
+                    configCache.defaultPlaylistName = name;
+                    currentPlaylist = name;
+                    playlistsCache.forEach(function (p) {
+                        p.isDefault = (p.name.toLowerCase() === name.toLowerCase());
+                        if (p.isDefault) p.isPinned = true;
+                    });
+                    renderPlaylistRowsAndSelect();
+
+                    ApiClient.ajax({
+                        type: 'POST',
+                        url: getApiUrl('UpdatePlaylistSettings'),
+                        data: JSON.stringify({
+                            PlaylistName: name,
+                            SetAsDefault: true,
+                            UserId: getCurrentUserIdSafe() || null
+                        }),
+                        contentType: 'application/json',
+                        dataType: 'json'
+                    }).then(function () {
+                        loadConfigAndPlaylists(function () {
+                            loadTriageItems();
+                            showDashNotice('Default triage target set to: ' + name);
+                            if (window.PlaylistTriageRefresh) window.PlaylistTriageRefresh();
+                        });
+                    }).catch(function (err) {
+                        console.error('[PlaylistTriage] Failed setting default playlist:', err);
+                        showDashNotice('Could not update default playlist.');
+                    });
+                }
+
+                function togglePinPlaylist(name, nextPin) {
+                    playlistsCache.forEach(function (p) {
+                        if (p.name.toLowerCase() === name.toLowerCase()) {
+                            p.isPinned = nextPin;
+                        }
+                    });
+                    renderPlaylistRowsAndSelect();
+
+                    ApiClient.ajax({
+                        type: 'POST',
+                        url: getApiUrl('UpdatePlaylistSettings'),
+                        data: JSON.stringify({
+                            PlaylistName: name,
+                            PinToOsd: nextPin,
+                            UserId: getCurrentUserIdSafe() || null
+                        }),
+                        contentType: 'application/json',
+                        dataType: 'json'
+                    }).then(function () {
+                        loadConfigAndPlaylists(function () {
+                            showDashNotice((nextPin ? 'Pinned to OSD: ' : 'Unpinned from OSD: ') + name);
+                            if (window.PlaylistTriageRefresh) window.PlaylistTriageRefresh();
+                        });
+                    }).catch(function (err) {
+                        console.error('[PlaylistTriage] Failed updating OSD pin:', err);
+                    });
+                }
+
+                function deletePlaylist(name) {
+                    if (playlistsCache.length <= 1) {
+                        showDashNotice('At least one playlist must remain configured.');
+                        return;
+                    }
+                    if (!confirm('Remove playlist "' + name + '" from Triage? (Media files on disk will NOT be deleted)')) {
+                        return;
+                    }
+                    ApiClient.ajax({
+                        type: 'POST',
+                        url: getApiUrl('DeletePlaylist'),
+                        data: JSON.stringify({
+                            PlaylistName: name,
+                            UserId: getCurrentUserIdSafe() || null
+                        }),
+                        contentType: 'application/json',
+                        dataType: 'json'
+                    }).then(function () {
+                        if (currentPlaylist.toLowerCase() === name.toLowerCase()) {
+                            currentPlaylist = '';
+                        }
+                        loadConfigAndPlaylists(function () {
+                            loadTriageItems();
+                            if (window.PlaylistTriageRefresh) window.PlaylistTriageRefresh();
+                        });
+                    });
+                }
+
+                function loadTriageItems() {
+                    var tbody = document.getElementById('triageTableBody');
+                    if (tbody) {
+                        tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><h3>Loading triage items...</h3></td></tr>';
+                    }
+
+                    var targetName = currentPlaylist || configCache.defaultPlaylistName || 'Triage Queue';
+                    if (targetName.toLowerCase() === 'vidz') {
+                        targetName = 'Triage Queue';
+                        currentPlaylist = 'Triage Queue';
+                    }
+
+                    ApiClient.ajax({
+                        type: 'GET',
+                        url: getApiUrl('TriageList?playlistName=' + encodeURIComponent(targetName) + '&userId=' + getCurrentUserIdSafe() + '&_t=' + Date.now()),
+                        dataType: 'json'
+                    }).then(function (res) {
+                        var rawItems = prop(res, 'items') || [];
+                        triageData = {
+                            playlistId: prop(res, 'playlistId'),
+                            playlistName: prop(res, 'playlistName') || targetName,
+                            totalItems: prop(res, 'totalItems') || rawItems.length,
+                            totalSizeBytes: prop(res, 'totalSizeBytes') || 0,
+                            formattedTotalSize: prop(res, 'formattedTotalSize') || '0 B',
+                            userCanDeleteFiles: !!prop(res, 'userCanDeleteFiles'),
+                            items: rawItems.map(function (it) {
+                                return {
+                                    itemId: prop(it, 'itemId'),
+                                    playlistItemId: prop(it, 'playlistItemId') || '',
+                                    name: prop(it, 'name') || 'Unknown Media',
+                                    path: prop(it, 'path') || '',
+                                    bitrate: prop(it, 'bitrate') || 0,
+                                    formattedBitrate: prop(it, 'formattedBitrate') || '--',
+                                    width: prop(it, 'width') || 0,
+                                    height: prop(it, 'height') || 0,
+                                    resolution: prop(it, 'resolution') || 'Auto',
+                                    videoCodec: prop(it, 'videoCodec') || 'N/A',
+                                    audioCodec: prop(it, 'audioCodec') || '',
+                                    container: prop(it, 'container') || '',
+                                    sizeBytes: prop(it, 'sizeBytes') || 0,
+                                    formattedSize: prop(it, 'formattedSize') || '--',
+                                    formattedDuration: prop(it, 'formattedDuration') || '--',
+                                    mediaType: prop(it, 'mediaType') || 'Video',
+                                    primaryImageTag: prop(it, 'primaryImageTag') || null
+                                };
+                            })
+                        };
+
+                        selectedItemIds.clear();
+                        updateStats();
+                        renderTable();
+                    }).catch(function (err) {
+                        console.error('[PlaylistTriage] Error fetching triage list:', err);
+                        if (tbody) {
+                            tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><h3 style="color:#ef4444;">Failed to load triage items</h3></td></tr>';
+                        }
+                    });
+                }
+
+                function updateStats() {
+                    var activeName = triageData.playlistName || currentPlaylist || 'Triage Queue';
+                    var statNameEl = document.getElementById('statPlaylistName');
+                    if (statNameEl) {
+                        statNameEl.textContent = activeName;
+                    }
+                    var statCountEl = document.getElementById('statItemCount');
+                    if (statCountEl) {
+                        statCountEl.textContent = String(triageData.totalItems || 0);
+                    }
+                    var statSizeEl = document.getElementById('statTotalSize');
+                    if (statSizeEl) {
+                        statSizeEl.textContent = triageData.formattedTotalSize || '0 B';
+                    }
+
+                    var permEl = document.getElementById('statPermissions');
+                    if (permEl) {
+                        if (triageData.userCanDeleteFiles) {
+                            permEl.innerHTML = '<span style="color:#34d399;">Authorized (Admin / Owner)</span>';
+                        } else {
+                            permEl.innerHTML = '<span style="color:#fbbf24;">Delist Only (No disk delete)</span>';
+                        }
+                    }
+                }
+
+                function getFilteredAndSortedItems() {
+                    var list = (triageData.items || []).slice();
+                    var filterInput = document.getElementById('inputFilterTable');
+                    var q = filterInput ? (filterInput.value || '').trim().toLowerCase() : '';
+                    if (q) {
+                        list = list.filter(function (it) {
+                            return (it.name || '').toLowerCase().indexOf(q) !== -1 ||
+                                   (it.path || '').toLowerCase().indexOf(q) !== -1 ||
+                                   (it.videoCodec || '').toLowerCase().indexOf(q) !== -1 ||
+                                   (it.resolution || '').toLowerCase().indexOf(q) !== -1;
+                        });
+                    }
+
+                    var sortSelect = document.getElementById('selectSortTable');
+                    var sortMode = sortSelect ? sortSelect.value : 'default';
+                    if (sortMode === 'size_desc') {
+                        list.sort(function (a, b) { return (b.sizeBytes || 0) - (a.sizeBytes || 0); });
+                    } else if (sortMode === 'size_asc') {
+                        list.sort(function (a, b) { return (a.sizeBytes || 0) - (b.sizeBytes || 0); });
+                    } else if (sortMode === 'title_asc') {
+                        list.sort(function (a, b) { return (a.name || '').localeCompare(b.name || ''); });
+                    } else if (sortMode === 'bitrate_desc') {
+                        list.sort(function (a, b) { return (b.bitrate || 0) - (a.bitrate || 0); });
+                    }
+
+                    return list;
+                }
+
+                function renderTable() {
+                    var tbody = document.getElementById('triageTableBody');
+                    if (!tbody) return;
+
+                    var itemsToRender = getFilteredAndSortedItems();
+
+                    if (!itemsToRender || itemsToRender.length === 0) {
+                        var activeName = triageData.playlistName || currentPlaylist || 'Triage Queue';
+                        tbody.innerHTML = [
+                            '<tr>',
+                            '  <td colspan="10" class="empty-state">',
+                            '    <h3>No triaged media items in "' + activeName + '"</h3>',
+                            '    <p style="margin:0.5em 0 0 0;font-size:0.85rem;">Play any media in Jellyfin and press hotkey or player OSD button to route items here.</p>',
+                            '  </td>',
+                            '</tr>'
+                        ].join('');
+                        return;
+                    }
+
+                    tbody.innerHTML = '';
+                    itemsToRender.forEach(function (item) {
+                        var tr = document.createElement('tr');
+                        tr.id = 'row-' + item.itemId;
+                        if (selectedItemIds.has(item.itemId)) {
+                            tr.classList.add('selected');
+                        }
+
+                        var posterUrl = item.primaryImageTag
+                            ? ApiClient.getUrl('Items/' + item.itemId + '/Images/Primary', { maxWidth: 80, tag: item.primaryImageTag })
+                            : '';
+
+                        var is4k = (item.height && item.height >= 2160) || (item.width && item.width >= 3840);
+                        var resBadgeClass = is4k ? 'badge badge-res-4k' : 'badge badge-res';
+
+                        var posterHtml = posterUrl
+                            ? '<img src="' + posterUrl + '" class="item-poster" alt="" />'
+                            : '<div class="item-poster" style="display:flex;align-items:center;justify-content:center;color:#64748b;"><span class="material-icons" style="font-size:18px;">movie</span></div>';
+
+                        var containerBadge = item.container ? '<span class="badge badge-codec">' + item.container + '</span>' : '';
+                        var audioBadge = item.audioCodec ? '<span class="badge badge-codec">' + item.audioCodec + '</span>' : '';
+
+                        var purgeBtnHtml = triageData.userCanDeleteFiles
+                            ? '<button is="emby-button" type="button" class="button-delete btn-single-purge" data-id="' + item.itemId + '" data-playlist-id="' + item.playlistItemId + '" style="margin:0 0 0 4px;padding:0.35em 0.7em;font-size:0.75rem;" title="Purge file from disk">Delete</button>'
+                            : '';
+
+                        tr.innerHTML = [
+                            '<td style="text-align: center;">',
+                            '  <label class="emby-checkbox-label" style="display:inline-flex;height:1.8em;padding-left:1.8em;margin:0;width:auto;">',
+                            '    <input type="checkbox" is="emby-checkbox" class="emby-checkbox item-checkbox" data-id="' + item.itemId + '" ' + (selectedItemIds.has(item.itemId) ? 'checked' : '') + ' />',
+                            '    <span class="checkboxOutline">',
+                            '      <span class="material-icons checkboxIcon checkboxIcon-checked" aria-hidden="true">check</span>',
+                            '      <span class="material-icons checkboxIcon checkboxIcon-unchecked" aria-hidden="true"></span>',
+                            '    </span>',
+                            '  </label>',
+                            '</td>',
+                            '<td>' + posterHtml + '</td>',
+                            '<td>',
+                            '  <div class="item-title-text" style="font-weight:600;color:#fff;"></div>',
+                            '  <div style="font-size:0.75rem;color:#a1a1aa;">' + (item.mediaType || 'Video') + '</div>',
+                            '</td>',
+                            '<td><span class="' + resBadgeClass + '">' + (item.resolution || 'Auto') + '</span></td>',
+                            '<td><span style="font-weight:600;color:#e2e8f0;">' + (item.videoCodec || 'N/A') + '</span>' + containerBadge + audioBadge + '</td>',
+                            '<td>' + (item.formattedBitrate || '--') + '</td>',
+                            '<td style="font-weight:600;color:#e2e8f0;">' + (item.formattedSize || '--') + '</td>',
+                            '<td>' + (item.formattedDuration || '--') + '</td>',
+                            '<td class="path-cell" title="Click to copy file path"></td>',
+                            '<td style="text-align: right; white-space: nowrap;">',
+                            '  <button is="emby-button" type="button" class="button-alt btn-single-remove" data-id="' + item.itemId + '" data-playlist-id="' + item.playlistItemId + '" style="margin:0;padding:0.35em 0.7em;font-size:0.75rem;" title="Remove from playlist">Delist</button>',
+                            purgeBtnHtml,
+                            '</td>'
+                        ].join('');
+
+                        var titleEl = tr.querySelector('.item-title-text');
+                        if (titleEl) {
+                            titleEl.textContent = item.name;
+                            titleEl.title = item.name;
+                        }
+                        var pathEl = tr.querySelector('.path-cell');
+                        if (pathEl) {
+                            pathEl.textContent = item.path || 'Virtual / Unknown';
+                            pathEl.setAttribute('data-path', item.path || '');
+                        }
+
+                        tbody.appendChild(tr);
+                    });
+
+                    tbody.querySelectorAll('.item-checkbox').forEach(function (cb) {
+                        cb.addEventListener('change', function () {
+                            var id = this.getAttribute('data-id');
+                            var rowEl = document.getElementById('row-' + id);
+                            if (this.checked) {
+                                selectedItemIds.add(id);
+                                if (rowEl) rowEl.classList.add('selected');
+                            } else {
+                                selectedItemIds.delete(id);
+                                if (rowEl) rowEl.classList.remove('selected');
+                            }
+                        });
+                    });
+
+                    tbody.querySelectorAll('.path-cell').forEach(function (el) {
+                        el.addEventListener('click', function () {
+                            var path = this.getAttribute('data-path');
+                            if (path && navigator.clipboard) {
+                                navigator.clipboard.writeText(path).then(function () {
+                                    showDashNotice('File path copied to clipboard:\n' + path);
+                                });
+                            }
+                        });
+                    });
+
+                    tbody.querySelectorAll('.btn-single-remove').forEach(function (btn) {
+                        btn.addEventListener('click', function () {
+                            var id = this.getAttribute('data-id');
+                            var pId = this.getAttribute('data-playlist-id');
+                            executeBatchAction('remove_from_playlist', [{ ItemId: id, PlaylistItemId: pId }]);
+                        });
+                    });
+
+                    tbody.querySelectorAll('.btn-single-purge').forEach(function (btn) {
+                        btn.addEventListener('click', function () {
+                            var id = this.getAttribute('data-id');
+                            var pId = this.getAttribute('data-playlist-id');
+                            var target = triageData.items.find(function (i) { return i.itemId === id; });
+                            openPurgeModal(target ? [target] : [{ itemId: id, playlistItemId: pId }]);
+                        });
+                    });
+                }
+
+                function formatBytes(bytes) {
+                    if (!bytes || bytes <= 0) return '0 B';
+                    var suffixes = ['B', 'KB', 'MB', 'GB', 'TB'];
+                    var i = 0;
+                    var num = bytes;
+                    while (Math.round(num / 1024) >= 1 && i < suffixes.length - 1) {
+                        num /= 1024;
+                        i++;
+                    }
+                    return num.toFixed(1) + ' ' + suffixes[i];
+                }
+
+                function openPurgeModal(items) {
+                    var modal = document.getElementById('purgeModalBackdrop');
+                    var countEl = document.getElementById('modalPurgeCount');
+                    var sizeEl = document.getElementById('modalPurgeSize');
+                    var listEl = document.getElementById('modalPurgeFilesList');
+                    var confirmCb = document.getElementById('modalConfirmCheckbox');
+                    var btnConfirm = document.getElementById('btnConfirmPurge');
+
+                    confirmCb.checked = false;
+                    btnConfirm.disabled = true;
+                    btnConfirm.style.opacity = '0.5';
+                    btnConfirm.style.cursor = 'not-allowed';
+
+                    var totalSize = 0;
+                    listEl.innerHTML = '';
+                    items.forEach(function (item) {
+                        if (item.sizeBytes) totalSize += item.sizeBytes;
+                        var row = document.createElement('div');
+                        row.style.padding = '0.2rem 0';
+                        row.textContent = '• [' + (item.formattedSize || '?') + '] ' + (item.path || item.name);
+                        listEl.appendChild(row);
+                    });
+
+                    countEl.textContent = String(items.length);
+                    sizeEl.textContent = formatBytes(totalSize);
+                    var qTitleEl = document.getElementById('modalPurgeQueueTitle');
+                    if (qTitleEl) qTitleEl.textContent = currentPlaylist || 'Queue';
+                    var qNameEl = document.getElementById('modalPurgeQueueName');
+                    if (qNameEl) qNameEl.textContent = '"' + (currentPlaylist || 'Selected Queue') + '"';
+                    modal.style.display = 'flex';
+
+                    btnConfirm.onclick = function () {
+                        modal.style.display = 'none';
+                        executeBatchAction('delete_file_from_disk', items.map(function (i) {
+                            return { ItemId: i.itemId, PlaylistItemId: i.playlistItemId };
+                        }));
+                    };
+                }
+
+                function executeBatchAction(action, targetItems) {
+                    if (window.Dashboard && Dashboard.showLoadingMsg) Dashboard.showLoadingMsg();
+                    ApiClient.ajax({
+                        type: 'POST',
+                        url: getApiUrl('ResolveBatch'),
+                        data: JSON.stringify({
+                            Action: action,
+                            PlaylistName: currentPlaylist,
+                            PlaylistId: triageData.playlistId,
+                            Items: targetItems,
+                            UserId: getCurrentUserIdSafe() || null
+                        }),
+                        contentType: 'application/json',
+                        dataType: 'json'
+                    }).then(function (res) {
+                        if (window.Dashboard && Dashboard.hideLoadingMsg) Dashboard.hideLoadingMsg();
+                        showDashNotice(prop(res, 'message') || 'Operation completed successfully.');
+                        loadConfigAndPlaylists(function () {
+                            loadTriageItems();
+                        });
+                    }).catch(function (err) {
+                        if (window.Dashboard && Dashboard.hideLoadingMsg) Dashboard.hideLoadingMsg();
+                        showDashNotice('Error executing triage resolution:\n' + ((err && err.responseJSON && err.responseJSON.message) || 'Server error'));
+                    });
+                }
+
+                function saveOsdPreferences() {
+                    var swap = document.getElementById('cbStudioSwapOsd').checked;
+                    var hideStop = document.getElementById('cbStudioHideStop').checked;
+                    var hidePrev = document.getElementById('cbStudioHidePrevNext').checked;
+
+                    configCache.swapOsdControls = swap;
+                    configCache.hideStopButton = hideStop;
+                    configCache.hidePrevNextButtons = hidePrev;
+
+                    ApiClient.ajax({
+                        type: 'POST',
+                        url: getApiUrl('SaveOverlayPreferences'),
+                        data: JSON.stringify({
+                            SwapOsdControls: swap,
+                            HideStopButton: hideStop,
+                            HidePrevNextButtons: hidePrev
+                        }),
+                        contentType: 'application/json'
+                    }).then(function () {
+                        showDashNotice('OSD preferences saved.');
+                        if (window.PlaylistTriageRefresh) window.PlaylistTriageRefresh();
+                    });
+                }
+
+                function bindPageEventsOnce() {
+                    var page = document.getElementById('triageManagementPage');
+                    if (!page || page.getAttribute('data-pt-bound') === 'true') return;
+                    page.setAttribute('data-pt-bound', 'true');
+
+                    // Tab switching
+                    document.querySelectorAll('#triageManagementPage .pt-tab-button').forEach(function (btn) {
+                        btn.addEventListener('click', function () {
+                            var tab = this.getAttribute('data-tab');
+                            switchTab(tab);
+                        });
+                    });
+
+                    // Refresh
+                    document.getElementById('btnRefreshList').addEventListener('click', function () {
+                        loadConfigAndPlaylists(function () {
+                            loadTriageItems();
+                        });
+                    });
+
+                    // Toolbar viewing playlist change
+                    document.getElementById('selectPlaylist').addEventListener('change', function () {
+                        currentPlaylist = this.value;
+                        renderPlaylistRowsAndSelect();
+                        loadTriageItems();
+                    });
+
+                    document.getElementById('inputFilterTable').addEventListener('input', function () {
+                        renderTable();
+                    });
+
+                    document.getElementById('selectSortTable').addEventListener('change', function () {
+                        renderTable();
+                    });
+
+                    // Bulk remove from playlist
+                    document.getElementById('btnBulkRemovePlaylist').addEventListener('click', function () {
+                        var targets = triageData.items
+                            .filter(function (i) { return selectedItemIds.has(i.itemId); })
+                            .map(function (i) { return { ItemId: i.itemId, PlaylistItemId: i.playlistItemId }; });
+                        if (targets.length === 0) {
+                            showDashNotice('Please select one or more media items in the table.');
+                            return;
+                        }
+                        executeBatchAction('remove_from_playlist', targets);
+                    });
+
+                    // Bulk purge from disk
+                    document.getElementById('btnBulkPurgeDisk').addEventListener('click', function () {
+                        var targets = triageData.items.filter(function (i) { return selectedItemIds.has(i.itemId); });
+                        if (targets.length === 0) {
+                            showDashNotice('Please select one or more media items in the table.');
+                            return;
+                        }
+                        openPurgeModal(targets);
+                    });
+
+                    // Purge Entire Queue button
+                    document.getElementById('btnPurgeEntireQueueHeader').addEventListener('click', function () {
+                        if (!triageData.items || triageData.items.length === 0) {
+                            showDashNotice('Playlist "' + (currentPlaylist || 'Triage Queue') + '" is currently empty.');
+                            return;
+                        }
+                        openPurgeModal(triageData.items);
+                    });
+
+                    // Table Select All Checkbox
+                    document.getElementById('selectAllCheckbox').addEventListener('change', function () {
+                        var visibleItems = getFilteredAndSortedItems();
+                        if (this.checked) {
+                            visibleItems.forEach(function (i) { selectedItemIds.add(i.itemId); });
+                        } else {
+                            selectedItemIds.clear();
+                        }
+                        renderTable();
+                    });
+
+                    // Create Playlist
+                    document.getElementById('btnCreatePlaylist').addEventListener('click', function () {
+                        var nameInput = document.getElementById('inputNewPlaylistName');
+                        var iconSel = document.getElementById('selectNewPlaylistIcon');
+                        var pinCb = document.getElementById('cbNewPlaylistPinOsd');
+                        var defCb = document.getElementById('cbNewPlaylistDefault');
+
+                        var newName = (nameInput.value || '').trim();
+                        if (!newName) {
+                            showDashNotice('Please enter a playlist name.');
+                            return;
+                        }
+
+                        ApiClient.ajax({
+                            type: 'POST',
+                            url: getApiUrl('CreatePlaylist'),
+                            data: JSON.stringify({
+                                Name: newName,
+                                IconKey: iconSel.value || 'bookmark',
+                                PinToOsd: !!pinCb.checked,
+                                SetAsDefault: !!defCb.checked,
+                                UserId: getCurrentUserIdSafe() || null
+                            }),
+                            contentType: 'application/json',
+                            dataType: 'json'
+                        }).then(function () {
+                            nameInput.value = '';
+                            defCb.checked = false;
+                            currentPlaylist = newName;
+                            loadConfigAndPlaylists(function () {
+                                loadTriageItems();
+                                showDashNotice('Playlist "' + newName + '" created.');
+                                if (window.PlaylistTriageRefresh) window.PlaylistTriageRefresh();
+                            });
+                        }).catch(function () {
+                            showDashNotice('Could not create playlist.');
+                        });
+                    });
+
+                    document.getElementById('inputNewPlaylistName').addEventListener('keydown', function (e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            document.getElementById('btnCreatePlaylist').click();
+                        }
+                    });
+
+                    // Hotkey input & save
+                    var hotkeyInput = document.getElementById('inputDashHotkey');
+                    hotkeyInput.onkeydown = function (e) {
+                        e.preventDefault();
+                        var keys = [];
+                        if (e.ctrlKey) keys.push('Ctrl');
+                        if (e.metaKey) keys.push('Cmd');
+                        if (e.altKey) keys.push('Alt');
+                        if (e.shiftKey) keys.push('Shift');
+                        var k = (e.key || '').toUpperCase();
+                        if (k !== 'CONTROL' && k !== 'ALT' && k !== 'SHIFT' && k !== 'META') keys.push(k);
+                        if (keys.length > 0) hotkeyInput.value = keys.join('+');
+                    };
+
+                    document.getElementById('btnSaveDashHotkey').addEventListener('click', function () {
+                        var val = (hotkeyInput.value || '').trim();
+                        if (!val) return;
+                        ApiClient.ajax({
+                            type: 'POST',
+                            url: getApiUrl('SetHotkey?hotkey=' + encodeURIComponent(val))
+                        }).then(function () {
+                            configCache.configuredHotkey = val;
+                            showDashNotice('Keyboard shortcut saved: ' + val);
+                            if (window.PlaylistTriageRefresh) window.PlaylistTriageRefresh();
+                        });
+                    });
+
+                    // OSD Settings changes
+                    document.getElementById('cbStudioSwapOsd').addEventListener('change', saveOsdPreferences);
+                    document.getElementById('cbStudioHideStop').addEventListener('change', saveOsdPreferences);
+                    document.getElementById('cbStudioHidePrevNext').addEventListener('change', saveOsdPreferences);
+
+                    // Purge Modal event listeners
+                    document.getElementById('modalConfirmCheckbox').addEventListener('change', function () {
+                        var btn = document.getElementById('btnConfirmPurge');
+                        if (btn) {
+                            btn.disabled = !this.checked;
+                            btn.style.opacity = this.checked ? '1' : '0.5';
+                            btn.style.cursor = this.checked ? 'pointer' : 'not-allowed';
+                        }
+                    });
+
+                    document.getElementById('btnCancelPurge').addEventListener('click', function () {
+                        document.getElementById('purgeModalBackdrop').style.display = 'none';
+                    });
+                }
+
+                window.PlaylistTriageInitDashboard = function () {
+                    ensureClientExtensionLoaded();
+                    bindPageEventsOnce();
+                    loadConfigAndPlaylists(function () {
+                        loadTriageItems();
+                    });
+                };
+
+                window.PlaylistTriageDashboardReload = function () {
+                    loadConfigAndPlaylists(function () {
+                        loadTriageItems();
+                    });
+                };
+
+                document.addEventListener('viewshow', function (e) {
+                    if (e.target && e.target.id === 'triageManagementPage') {
+                        window.PlaylistTriageInitDashboard();
+                    }
+                });
+
+                if (document.getElementById('triageManagementPage')) {
+                    window.PlaylistTriageInitDashboard();
+                }
+            })();
+        </script>
+        <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" style="display:none;" onload="if(window.PlaylistTriageInitDashboard)window.PlaylistTriageInitDashboard();" />
+    </div>
+</body>
+</html>

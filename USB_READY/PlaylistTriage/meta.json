@@ -1,0 +1,16 @@
+{
+  "category": "General",
+  "changelog": "v1.2.1: Fix macOS Set Default caching, SQLite retry resilience, library name collision guard, and multi-path Mac installer.",
+  "description": "Cnidocil (jellyfin-plugin-cnidocil) - Quick playlist triage and media library pruning with hybrid hotkey + OSD marking and bulk disk management.",
+  "guid": "b14f8263-5e92-4f6b-871d-5a9e7019c4b2",
+  "name": "Cnidocil",
+  "overview": "Cnidocil (jellyfin-plugin-cnidocil) - Effortlessly flag currently playing media into playlists with Ctrl+Shift+B or player OSD button, review enriched file/stream metadata, and bulk remove or permanently purge from disk.",
+  "owner": "findawebguy",
+  "projectUrl": "https://github.com/findawebguy/jellyfin-plugin-cnidocil",
+  "targetAbi": "10.9.0.0",
+  "timestamp": "2026-10-30T15:20:00.0000000Z",
+  "version": "1.2.1.0",
+  "status": "Active",
+  "autoUpdate": false,
+  "assemblies": []
+}
