@@ -16,6 +16,7 @@ using MediaBrowser.Controller.Session;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.Playlists;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -24,6 +25,7 @@ namespace Jellyfin.Plugin.PlaylistTriage.Api;
 /// <summary>
 /// API Controller providing REST endpoints for Jellyfin Playlist Triage and Library Pruning.
 /// </summary>
+[Authorize]
 [ApiController]
 [Route("Plugins/PlaylistTriage")]
 public class TriageController : ControllerBase
@@ -31,6 +33,7 @@ public class TriageController : ControllerBase
     private readonly IPlaylistManager _playlistManager;
     private readonly ILibraryManager _libraryManager;
     private readonly ISessionManager _sessionManager;
+    private readonly IUserManager _userManager;
     private readonly ILogger<TriageController> _logger;
 
     /// <summary>
@@ -40,11 +43,13 @@ public class TriageController : ControllerBase
         IPlaylistManager playlistManager,
         ILibraryManager libraryManager,
         ISessionManager sessionManager,
+        IUserManager userManager,
         ILogger<TriageController> logger)
     {
         _playlistManager = playlistManager;
         _libraryManager = libraryManager;
         _sessionManager = sessionManager;
+        _userManager = userManager;
         _logger = logger;
     }
 
@@ -323,7 +328,7 @@ public class TriageController : ControllerBase
         }
 
         var resolvedUserId = ResolveCallingUserId(userId);
-        var userCanDelete = true;
+        var userCanDelete = CheckUserCanDelete(resolvedUserId);
 
         Playlist? targetPlaylist = null;
         if (resolvedUserId != Guid.Empty)
@@ -408,7 +413,7 @@ public class TriageController : ControllerBase
                     // Media stream probing failed gracefully
                 }
 
-                bool canDeleteItem = true;
+                bool canDeleteItem = userCanDelete;
 
                 itemsList.Add(new TriageItemDto
                 {
@@ -483,6 +488,16 @@ public class TriageController : ControllerBase
         }
 
         var callingUserId = ResolveCallingUserId(request.UserId);
+
+        if (action == "delete_file_from_disk" && !CheckUserCanDelete(callingUserId))
+        {
+            _logger.LogWarning("User {UserId} attempted to delete files from disk without permission", callingUserId);
+            return StatusCode(StatusCodes.Status403Forbidden, new ResolveBatchResponse
+            {
+                Success = false,
+                Message = "Forbidden: User does not have permission to delete content from disk."
+            });
+        }
 
         var defaultName = Plugin.Instance?.Configuration.DefaultPlaylistName;
         if (string.IsNullOrWhiteSpace(defaultName))
@@ -673,6 +688,14 @@ public class TriageController : ControllerBase
             return BadRequest(new { message = "Playlist name is required." });
         }
 
+        var callingUserId = ResolveCallingUserId(request.UserId);
+        if (!CheckUserIsAdmin(callingUserId))
+        {
+            _logger.LogWarning("User {UserId} attempted to delete playlist {Playlist} without admin permission",
+                callingUserId, request.PlaylistName);
+            return StatusCode(StatusCodes.Status403Forbidden, new { message = "Forbidden: Administrative privileges required to delete triage playlists." });
+        }
+
         var name = request.PlaylistName.Trim();
         if (Plugin.Instance != null)
         {
@@ -740,6 +763,14 @@ public class TriageController : ControllerBase
             return BadRequest(new { message = "Playlist name is required." });
         }
 
+        var callingUserId = ResolveCallingUserId(request.UserId);
+        if (!CheckUserIsAdmin(callingUserId))
+        {
+            _logger.LogWarning("User {UserId} attempted to delete playlist {Playlist} without admin permission",
+                callingUserId, request.PlaylistName);
+            return StatusCode(StatusCodes.Status403Forbidden, new { message = "Forbidden: Administrative privileges required to delete triage playlists." });
+        }
+
         var name = request.PlaylistName.Trim();
         if (Plugin.Instance != null)
         {
@@ -760,7 +791,6 @@ public class TriageController : ControllerBase
         // Also delete the playlist entity in Jellyfin if it exists (does NOT delete media files)
         try
         {
-            var callingUserId = ResolveCallingUserId(request.UserId);
             var existing = callingUserId != Guid.Empty
                 ? _playlistManager.GetPlaylists(callingUserId).OfType<Playlist>()
                 : QueryAllPlaylistsFromLibrarySafe();
@@ -798,6 +828,17 @@ public class TriageController : ControllerBase
         }
 
         var callingUserId = ResolveCallingUserId(request.UserId);
+
+        if (!CheckUserCanDelete(callingUserId))
+        {
+            _logger.LogWarning("User {UserId} attempted to purge queue {Playlist} without delete permission",
+                callingUserId, request.PlaylistName);
+            return StatusCode(StatusCodes.Status403Forbidden, new ResolveBatchResponse
+            {
+                Success = false,
+                Message = "Forbidden: User does not have permission to delete content from disk."
+            });
+        }
 
         var targetPlaylistName = !string.IsNullOrWhiteSpace(request.PlaylistName)
             ? request.PlaylistName.Trim()
@@ -987,6 +1028,12 @@ public class TriageController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public ActionResult UpdateConfiguration([FromBody] PluginConfiguration newConfig)
     {
+        var callingUserId = ResolveCallingUserId(null);
+        if (!CheckUserIsAdmin(callingUserId))
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { message = "Forbidden: Administrative privileges required." });
+        }
+
         if (Plugin.Instance != null && newConfig != null)
         {
             SafeUpdateConfiguration(newConfig);
@@ -998,6 +1045,7 @@ public class TriageController : ControllerBase
     /// <summary>
     /// Serves client-side injection script for Jellyfin Web / Desktop.
     /// </summary>
+    [AllowAnonymous]
     [HttpGet("ClientScript")]
     [Produces("application/javascript")]
     public ActionResult GetClientScript()
@@ -1418,32 +1466,60 @@ public class TriageController : ControllerBase
         return "bookmark";
     }
 
-    private Guid ResolveCallingUserId(Guid? explicitUserId)
+    private bool CheckUserCanDelete(Guid userId)
     {
-        if (explicitUserId.HasValue && explicitUserId.Value != Guid.Empty)
+        if (userId == Guid.Empty)
         {
-            return explicitUserId.Value;
+            return false;
         }
 
+        var user = _userManager.GetUserById(userId);
+        if (user == null)
+        {
+            return false;
+        }
+
+        return user.HasPermission(PermissionKind.IsAdministrator) ||
+               user.HasPermission(PermissionKind.EnableContentDeletion);
+    }
+
+    private bool CheckUserIsAdmin(Guid userId)
+    {
+        if (userId == Guid.Empty)
+        {
+            return false;
+        }
+
+        var user = _userManager.GetUserById(userId);
+        return user != null && user.HasPermission(PermissionKind.IsAdministrator);
+    }
+
+    private Guid ResolveCallingUserId(Guid? explicitUserId)
+    {
         var claim = User?.FindFirst(ClaimTypes.NameIdentifier)
                  ?? User?.FindFirst("UserId")
                  ?? User?.FindFirst("Jellyfin-UserId");
-        if (claim != null && Guid.TryParse(claim.Value, out var claimUserId) && claimUserId != Guid.Empty)
+
+        Guid authenticatedUserId = Guid.Empty;
+        if (claim != null && Guid.TryParse(claim.Value, out var parsedClaimId))
         {
-            return claimUserId;
+            authenticatedUserId = parsedClaimId;
         }
 
-        try
+        if (explicitUserId.HasValue && explicitUserId.Value != Guid.Empty)
         {
-            var activeWithUser = _sessionManager.Sessions.FirstOrDefault(s => s.UserId != Guid.Empty);
-            if (activeWithUser != null)
+            if (authenticatedUserId == explicitUserId.Value || CheckUserIsAdmin(authenticatedUserId))
             {
-                return activeWithUser.UserId;
+                return explicitUserId.Value;
             }
+
+            _logger.LogWarning("Caller {AuthUser} attempted to act on behalf of user {TargetUser} without admin rights",
+                authenticatedUserId, explicitUserId.Value);
         }
-        catch
+
+        if (authenticatedUserId != Guid.Empty)
         {
-            // Ignore session enumeration issues
+            return authenticatedUserId;
         }
 
         return Guid.Empty;
@@ -1453,21 +1529,25 @@ public class TriageController : ControllerBase
     {
         var allSessions = _sessionManager.Sessions.ToList();
 
-        // 1. By sessionId
+        // 1. By sessionId (scoped to userId if known)
         if (!string.IsNullOrEmpty(sessionId))
         {
             var match = allSessions.FirstOrDefault(s => string.Equals(s.Id, sessionId, StringComparison.OrdinalIgnoreCase));
             if (match != null && (match.NowPlayingItem != null || match.FullNowPlayingItem != null))
             {
-                return match;
+                if (!userId.HasValue || userId.Value == Guid.Empty || match.UserId == userId.Value)
+                {
+                    return match;
+                }
             }
         }
 
-        // 2. By deviceId + playback active
+        // 2. By deviceId + playback active (scoped to userId if known)
         if (!string.IsNullOrEmpty(deviceId))
         {
             var match = allSessions
                 .Where(s => string.Equals(s.DeviceId, deviceId, StringComparison.OrdinalIgnoreCase) &&
+                            (!userId.HasValue || userId.Value == Guid.Empty || s.UserId == userId.Value) &&
                             (s.NowPlayingItem != null || s.FullNowPlayingItem != null))
                 .OrderByDescending(s => s.LastPlaybackCheckIn)
                 .ThenByDescending(s => s.LastActivityDate)
@@ -1494,29 +1574,19 @@ public class TriageController : ControllerBase
             }
         }
 
-        // 4. Any session on the server currently playing media
-        var anyActive = allSessions
-            .Where(s => s.NowPlayingItem != null || s.FullNowPlayingItem != null)
-            .OrderByDescending(s => s.LastPlaybackCheckIn)
-            .ThenByDescending(s => s.LastActivityDate)
-            .FirstOrDefault();
-
-        if (anyActive != null)
-        {
-            return anyActive;
-        }
-
-        // 5. Fallback: match by deviceId even if playback checkin was slightly delayed
+        // 4. Fallback: match by deviceId even if playback checkin was slightly delayed
         if (!string.IsNullOrEmpty(deviceId))
         {
-            var devMatch = allSessions.FirstOrDefault(s => string.Equals(s.DeviceId, deviceId, StringComparison.OrdinalIgnoreCase));
+            var devMatch = allSessions.FirstOrDefault(s =>
+                string.Equals(s.DeviceId, deviceId, StringComparison.OrdinalIgnoreCase) &&
+                (!userId.HasValue || userId.Value == Guid.Empty || s.UserId == userId.Value));
             if (devMatch != null)
             {
                 return devMatch;
             }
         }
 
-        // 6. Fallback: match by userId if single session
+        // 5. Fallback: match by userId if single session
         if (userId.HasValue && userId.Value != Guid.Empty)
         {
             var userSessions = allSessions.Where(s => s.UserId == userId.Value).ToList();
@@ -1608,8 +1678,16 @@ public class TriageController : ControllerBase
     /// Triggers an immediate media library scan to pick up newly added media files.
     /// </summary>
     [HttpPost("ScanLibrary")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public ActionResult ScanLibrary()
     {
+        var callingUserId = ResolveCallingUserId(null);
+        if (!CheckUserIsAdmin(callingUserId))
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { message = "Forbidden: Administrative privileges required." });
+        }
+
         _libraryManager.ValidateMediaLibrary(new Progress<double>(), CancellationToken.None);
         return Ok(new { success = true, message = "Library scan triggered." });
     }

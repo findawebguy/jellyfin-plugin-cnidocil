@@ -663,6 +663,16 @@
                     return obj[pascal];
                 }
 
+                function escapeHtml(str) {
+                    if (str === null || str === undefined) return '';
+                    return String(str)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;');
+                }
+
                 function getApiUrl(path) {
                     if (typeof ApiClient !== 'undefined' && ApiClient.getUrl) {
                         return ApiClient.getUrl('Plugins/PlaylistTriage/' + path);
@@ -1124,20 +1134,20 @@
                         var resBadgeClass = is4k ? 'badge badge-res-4k' : 'badge badge-res';
 
                         var posterHtml = posterUrl
-                            ? '<img src="' + posterUrl + '" class="item-poster" alt="" />'
+                            ? '<img src="' + escapeHtml(posterUrl) + '" class="item-poster" alt="" />'
                             : '<div class="item-poster" style="display:flex;align-items:center;justify-content:center;color:#64748b;"><span class="material-icons" style="font-size:18px;">movie</span></div>';
 
-                        var containerBadge = item.container ? '<span class="badge badge-codec">' + item.container + '</span>' : '';
-                        var audioBadge = item.audioCodec ? '<span class="badge badge-codec">' + item.audioCodec + '</span>' : '';
+                        var containerBadge = item.container ? '<span class="badge badge-codec">' + escapeHtml(item.container) + '</span>' : '';
+                        var audioBadge = item.audioCodec ? '<span class="badge badge-codec">' + escapeHtml(item.audioCodec) + '</span>' : '';
 
                         var purgeBtnHtml = triageData.userCanDeleteFiles
-                            ? '<button is="emby-button" type="button" class="button-delete btn-single-purge" data-id="' + item.itemId + '" data-playlist-id="' + item.playlistItemId + '" style="margin:0 0 0 4px;padding:0.35em 0.7em;font-size:0.75rem;" title="Purge file from disk">Delete</button>'
+                            ? '<button is="emby-button" type="button" class="button-delete btn-single-purge" data-id="' + escapeHtml(item.itemId) + '" data-playlist-id="' + escapeHtml(item.playlistItemId) + '" style="margin:0 0 0 4px;padding:0.35em 0.7em;font-size:0.75rem;" title="Purge file from disk">Delete</button>'
                             : '';
 
                         tr.innerHTML = [
                             '<td style="text-align: center;">',
                             '  <label class="emby-checkbox-label" style="display:inline-flex;height:1.8em;padding-left:1.8em;margin:0;width:auto;">',
-                            '    <input type="checkbox" is="emby-checkbox" class="emby-checkbox item-checkbox" data-id="' + item.itemId + '" ' + (selectedItemIds.has(item.itemId) ? 'checked' : '') + ' />',
+                            '    <input type="checkbox" is="emby-checkbox" class="emby-checkbox item-checkbox" data-id="' + escapeHtml(item.itemId) + '" ' + (selectedItemIds.has(item.itemId) ? 'checked' : '') + ' />',
                             '    <span class="checkboxOutline">',
                             '      <span class="material-icons checkboxIcon checkboxIcon-checked" aria-hidden="true">check</span>',
                             '      <span class="material-icons checkboxIcon checkboxIcon-unchecked" aria-hidden="true"></span>',
@@ -1147,16 +1157,16 @@
                             '<td>' + posterHtml + '</td>',
                             '<td>',
                             '  <div class="item-title-text" style="font-weight:600;color:#fff;"></div>',
-                            '  <div style="font-size:0.75rem;color:#a1a1aa;">' + (item.mediaType || 'Video') + '</div>',
+                            '  <div style="font-size:0.75rem;color:#a1a1aa;">' + escapeHtml(item.mediaType || 'Video') + '</div>',
                             '</td>',
-                            '<td><span class="' + resBadgeClass + '">' + (item.resolution || 'Auto') + '</span></td>',
-                            '<td><span style="font-weight:600;color:#e2e8f0;">' + (item.videoCodec || 'N/A') + '</span>' + containerBadge + audioBadge + '</td>',
-                            '<td>' + (item.formattedBitrate || '--') + '</td>',
-                            '<td style="font-weight:600;color:#e2e8f0;">' + (item.formattedSize || '--') + '</td>',
-                            '<td>' + (item.formattedDuration || '--') + '</td>',
+                            '<td><span class="' + resBadgeClass + '">' + escapeHtml(item.resolution || 'Auto') + '</span></td>',
+                            '<td><span style="font-weight:600;color:#e2e8f0;">' + escapeHtml(item.videoCodec || 'N/A') + '</span>' + containerBadge + audioBadge + '</td>',
+                            '<td>' + escapeHtml(item.formattedBitrate || '--') + '</td>',
+                            '<td style="font-weight:600;color:#e2e8f0;">' + escapeHtml(item.formattedSize || '--') + '</td>',
+                            '<td>' + escapeHtml(item.formattedDuration || '--') + '</td>',
                             '<td class="path-cell" title="Click to copy file path"></td>',
                             '<td style="text-align: right; white-space: nowrap;">',
-                            '  <button is="emby-button" type="button" class="button-alt btn-single-remove" data-id="' + item.itemId + '" data-playlist-id="' + item.playlistItemId + '" style="margin:0;padding:0.35em 0.7em;font-size:0.75rem;" title="Remove from playlist">Delist</button>',
+                            '  <button is="emby-button" type="button" class="button-alt btn-single-remove" data-id="' + escapeHtml(item.itemId) + '" data-playlist-id="' + escapeHtml(item.playlistItemId) + '" style="margin:0;padding:0.35em 0.7em;font-size:0.75rem;" title="Remove from playlist">Delist</button>',
                             purgeBtnHtml,
                             '</td>'
                         ].join('');

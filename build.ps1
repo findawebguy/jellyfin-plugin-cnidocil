@@ -22,9 +22,6 @@ if (Test-Path $OutputDir) {
 New-Item -ItemType Directory -Path "$OutputDir/$PluginDirName" -Force | Out-Null
 
 Copy-Item "$ProjectDir/bin/Release/net8.0/publish/$DllName" "$OutputDir/$PluginDirName/"
-if (Test-Path "$ProjectDir/bin/Release/net8.0/publish/*.pdb") {
-    Copy-Item "$ProjectDir/bin/Release/net8.0/publish/*.pdb" "$OutputDir/$PluginDirName/"
-}
 if (Test-Path "$ProjectDir/meta.json") {
     Copy-Item "$ProjectDir/meta.json" "$OutputDir/$PluginDirName/"
 }

@@ -3,9 +3,9 @@
 Production-ready Jellyfin Server Plugin (.NET 8) and Web Client Extension for high-speed media triage, playlist auto-routing, and safe disk-level library pruning.
 
 * **GitHub Repository**: [https://github.com/findawebguy/jellyfin-plugin-cnidocil](https://github.com/findawebguy/jellyfin-plugin-cnidocil)
-* **Subfolder of**: [Jellyfin Plugins Catalog](../README.md)
+* **Official Repository**: [jellyfin-plugin-cnidocil](https://github.com/findawebguy/jellyfin-plugin-cnidocil)
 * **Plugin GUID**: `b14f8263-5e92-4f6b-871d-5a9e7019c4b2`
-* **Gitea Repository**: [http://192.168.86.32:3000/findawebguy/jellyfin-plugins.git](http://192.168.86.32:3000/findawebguy/jellyfin-plugins.git)
+* **Gitea Repository**: [http://192.168.86.32:3000/findawebguy/jellyfin-plugin-cnidocil.git](http://192.168.86.32:3000/findawebguy/jellyfin-plugin-cnidocil.git)
 
 ---
 

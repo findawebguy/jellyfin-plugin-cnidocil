@@ -25,8 +25,21 @@
 (function () {
     'use strict';
 
-    // Chromium 129+ ScrollOptions.behavior strict validation safeguard (prevents TypeError on { behavior: null })
-    (function () {
+    function isJellyfinEnvironment() {
+        return !!(
+            window.ApiClient ||
+            window.playbackManager ||
+            document.querySelector('meta[name="application-name"][content*="Jellyfin"]') ||
+            document.querySelector('#videoOsdPage, .videoOsdBottom, .skinHeader, .mainDrawer')
+        );
+    }
+
+    if (!isJellyfinEnvironment()) {
+        return;
+    }
+
+    // Chromium 129+ ScrollOptions.behavior strict validation safeguard (scoped exclusively to confirmed Jellyfin context)
+    (function applyScrollPolyfill() {
         function s(a) {
             try {
                 if (a && 1 === a.length && a[0] && typeof a[0] === 'object' && a[0] !== null) {
@@ -65,15 +78,6 @@
         return;
     }
     window.PlaylistTriageInitialized = true;
-
-    function isJellyfinEnvironment() {
-        return !!(
-            window.ApiClient ||
-            window.playbackManager ||
-            document.querySelector('meta[name="application-name"][content*="Jellyfin"]') ||
-            document.querySelector('#videoOsdPage, .videoOsdBottom, .skinHeader, .mainDrawer, div[data-role="page"]')
-        );
-    }
 
     var ICONS = {
         trash: '<svg viewBox="0 0 24 24" style="width:19px;height:19px;fill:currentColor;"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>',
@@ -151,6 +155,16 @@
         if (obj[key] !== undefined) return obj[key];
         var pascal = key.charAt(0).toUpperCase() + key.slice(1);
         return obj[pascal];
+    }
+
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
     }
 
     function getApiUrl(subpath) {
@@ -1282,7 +1296,7 @@
             '  <div style="margin-bottom:16px;">',
             '    <label style="display:block;font-size:12px;font-weight:500;color:#a1a1aa;margin-bottom:6px;">Keyboard Shortcut:</label>',
             '    <div style="display:flex;gap:6px;">',
-            '      <input id="pt-input-hotkey" type="text" value="' + CONFIG.configuredHotkey + '" style="flex:1;background:#27272a;border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:6px 10px;color:#fff;font-family:monospace;font-size:12px;" />',
+            '      <input id="pt-input-hotkey" type="text" value="' + escapeHtml(CONFIG.configuredHotkey) + '" style="flex:1;background:#27272a;border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:6px 10px;color:#fff;font-family:monospace;font-size:12px;" />',
             '      <button type="button" id="pt-btn-save-config-modal" style="background:#00a4dc;border:none;color:#fff;padding:6px 14px;border-radius:6px;font-weight:600;font-size:12px;cursor:pointer;">Save</button>',
             '    </div>',
             '  </div>',

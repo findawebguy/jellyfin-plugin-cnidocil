@@ -19,7 +19,6 @@ mkdir -p "${OUTPUT_DIR}/${PLUGIN_DIR_NAME}"
 
 # Copy plugin binary
 cp "${PROJECT_DIR}/bin/Release/net8.0/publish/${DLL_NAME}" "${OUTPUT_DIR}/${PLUGIN_DIR_NAME}/"
-cp "${PROJECT_DIR}/bin/Release/net8.0/publish/"*.pdb "${OUTPUT_DIR}/${PLUGIN_DIR_NAME}/" 2>/dev/null || true
 
 # Copy client script
 cp "${PROJECT_DIR}/Web/triageClient.js" "${OUTPUT_DIR}/triageClient.js"
