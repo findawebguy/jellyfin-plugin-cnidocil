@@ -80,7 +80,15 @@ PlaylistTriage/
 ├── run-docker-test.bat                        # 1-click test container startup script
 ├── recreate-docker-test.bat                   # 1-click container recreation & password reset script
 ├── dist/                                      # Compiled release artifacts (.zip, .dll, scripts)
-└── USB_READY/                                 # Ready-to-copy offline USB installer package for Mac
+└── USB_READY/                                 # Ready-to-copy offline USB installer package (Windows & Mac)
+    ├── INSTALL_ON_WINDOWS.bat                 # 1-Click Windows PC auto-installer
+    ├── UNINSTALL_ON_WINDOWS.bat               # 1-Click Windows PC auto-uninstaller
+    ├── INSTALL_ON_MAC.command                 # 1-Click macOS Finder auto-installer
+    ├── UNINSTALL_FROM_MAC.command             # 1-Click macOS Finder auto-uninstaller
+    ├── PlaylistTriage/                        # Compiled .NET 8 DLL & meta.json
+    ├── Jellyfin.Plugin.PlaylistTriage.zip     # Compressed plugin bundle
+    ├── triageClient.js                        # Client injection script
+    └── Jellyfin-PlaylistTriage.user.js        # Browser userscript
 ```
 
 ---
@@ -113,32 +121,80 @@ The build output will generate:
 
 ## 🚀 Installation Options
 
-### Option 1: Native Plugin Installation (Server-Side)
-1. Stop your Jellyfin server.
-2. Locate your Jellyfin plugins directory:
-   - **macOS:** `~/.local/share/jellyfin/plugins` or `/Library/Application Support/jellyfin/plugins`
-   - **Docker / Container:** `/config/plugins`
-   - **Linux:** `/var/lib/jellyfin/plugins`
-   - **Windows:** `%ProgramData%\Jellyfin\Server\plugins`
-3. Create a folder named `PlaylistTriage` inside the `plugins` directory.
-4. Copy `dist/PlaylistTriage/Jellyfin.Plugin.PlaylistTriage.dll` into the `PlaylistTriage` folder.
-5. Start Jellyfin. The plugin will appear in **Dashboard -> Plugins**.
+### 🖥️ Windows PC Installation
 
-### Option 2: Browser Userscript (Tampermonkey / Violentmonkey)
-1. Install [Tampermonkey](https://www.tampermonkey.net/) in your web browser.
-2. Create a new userscript and paste the contents of [`Jellyfin-PlaylistTriage.user.js`](./Jellyfin-PlaylistTriage.user.js).
-3. The script is configured with `// ==UserScript==` targeting all pages (`*://*/*`) and automatically verifies Jellyfin's presence before running.
-4. Open Jellyfin Web. You will immediately see the playbar capsule and quick-triage dock during video playback!
+#### Method A: 1-Click USB / Batch Installer (Recommended)
+From the [`USB_READY`](./USB_READY) directory:
+1. Double-click [`INSTALL_ON_WINDOWS.bat`](./USB_READY/INSTALL_ON_WINDOWS.bat).
+2. The installer will automatically:
+   - Search standard Windows Jellyfin server paths:
+     - `%ProgramData%\Jellyfin\Server` (Default Windows Service / Installer)
+     - `%LocalAppData%\Jellyfin` (User-level / Portable)
+     - `%ProgramFiles%\Jellyfin\Server`
+   - Clean any stale or duplicate plugin builds (`PlaylistTriage*`).
+   - Create the target `plugins\PlaylistTriage` folder and deploy `Jellyfin.Plugin.PlaylistTriage.dll` and `meta.json`.
+   - Automatically check for local `jellyfin-web\index.html` and append the client script tag if present.
+3. Restart your Jellyfin Server (right-click the Jellyfin tray icon and select **Exit & Restart**, or restart the service via `services.msc`).
 
-### Option 3: Jellyfin JavaScript Injector Plugin
-1. Install the **JavaScript Injector** plugin from the Jellyfin Catalog.
-2. Go to **Dashboard -> Plugins -> JavaScript Injector**.
-3. Click **Add Script**, paste the content of [`triageClient.js`](./triageClient.js), toggle it **Active**, and click **Save**.
+#### Method B: Manual Windows PC Installation
+1. Stop your Jellyfin Server.
+2. Open Windows File Explorer (or press `Win + R`) and go to:
+   ```cmd
+   %ProgramData%\Jellyfin\Server\plugins
+   ```
+   *(If running portable, use `%LocalAppData%\Jellyfin\plugins`)*
+3. Create a new folder named `PlaylistTriage`.
+4. Copy the following files from `dist/PlaylistTriage/` (or `USB_READY/PlaylistTriage/`):
+   - `Jellyfin.Plugin.PlaylistTriage.dll`
+   - `meta.json`
+5. Start Jellyfin.
+6. Open your browser and navigate to your Jellyfin Web interface:
+   - **Cnidocil** will appear under **Dashboard -> Plugins**.
+   - The top navigation bar will display the **Cnidocil** tab and the playbar capsule will be active during video playback.
 
-### Option 4: macOS 1-Click USB Installer
+---
+
+### 🍎 macOS Installation (1-Click USB Installer)
 From the [`USB_READY`](./USB_READY) folder:
-* Plug your USB into the Mac and double-click [`INSTALL_ON_MAC.command`](./USB_READY/INSTALL_ON_MAC.command).
-* It automatically deploys the `.dll` and injects the client script into your Jellyfin Web distribution.
+1. Double-click [`INSTALL_ON_MAC.command`](./USB_READY/INSTALL_ON_MAC.command).
+2. It automatically scans `~/.local/share/jellyfin`, `~/Library/Application Support/jellyfin`, and `/Library/Application Support/jellyfin`, deploys the `.dll`, strips quarantine attributes (`xattr -cr`), and injects the client script into your Jellyfin Web distribution.
+3. Restart your Jellyfin server.
+
+---
+
+### 🐧 Linux & Docker Installation (Server-Side)
+1. Stop your Jellyfin container or service:
+   ```bash
+   sudo systemctl stop jellyfin
+   # Or for docker:
+   docker compose stop jellyfin
+   ```
+2. Locate your Jellyfin plugins directory:
+   - **Linux System:** `/var/lib/jellyfin/plugins`
+   - **Docker Host Volume:** Typically `./config/plugins` or `/mnt/user/appdata/jellyfin/plugins`
+3. Create the plugin directory and copy the release files:
+   ```bash
+   mkdir -p /var/lib/jellyfin/plugins/PlaylistTriage
+   cp dist/PlaylistTriage/Jellyfin.Plugin.PlaylistTriage.dll /var/lib/jellyfin/plugins/PlaylistTriage/
+   cp dist/PlaylistTriage/meta.json /var/lib/jellyfin/plugins/PlaylistTriage/
+   sudo chown -R jellyfin:jellyfin /var/lib/jellyfin/plugins/PlaylistTriage
+   ```
+4. Start Jellyfin.
+
+---
+
+### 🌐 Client-Only / Browser Extensions (For Viewers & Remote Users)
+
+#### Option 1: Browser Userscript (Tampermonkey / Violentmonkey)
+Use this if you are a user watching media on a Windows, Mac, or Linux browser and do not have administrative access to install server plugins:
+1. Install [Tampermonkey](https://www.tampermonkey.net/) or Violentmonkey in Chrome, Edge, Firefox, or Brave.
+2. Create a new script, paste the contents of [`Jellyfin-PlaylistTriage.user.js`](./Jellyfin-PlaylistTriage.user.js), and save (`Ctrl + S`).
+3. Open your Jellyfin Web client—the playbar capsule, queue manager popover, and top navigation shortcut will activate automatically!
+
+#### Option 2: Jellyfin JavaScript Injector Plugin
+If your server already has the community **JavaScript Injector** plugin:
+1. In Jellyfin Admin, go to **Dashboard -> Plugins -> JavaScript Injector**.
+2. Click **Add Script**, paste the content of [`triageClient.js`](./triageClient.js), toggle it **Active**, and click **Save**.
 
 ---
 
